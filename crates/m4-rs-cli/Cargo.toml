@@ -1,6 +1,6 @@
 [package]
 name = "m4-rs-cli"
-version = "0.1.1"
+version = "0.1.2"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
@@ -11,4 +11,4 @@ name = "m4-rs"
 path = "src/main.rs"
 
 [dependencies]
-m4-rs-core = { path = "../m4-rs-core", version = "0.1.0" }
+m4-rs-core = { path = "../m4-rs-core", version = "0.1.2" }
