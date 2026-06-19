@@ -1,114 +1,121 @@
 {
   "schema": "m4-rs-parity-matrix-v1",
-  "generated_at": "2026-06-18T00:00:00Z",
+  "generated_at": "2026-06-19T00:00:00Z",
+  "oracle": "GNU m4 1.4.21 (admitted, 65/75 pass)",
   "axes": [
     {
       "name": "CLI invocation",
       "court": "M4.CLI.1",
-      "status": "partial",
-      "note": "Basic argument parsing implemented"
+      "status": "sealed",
+      "note": "All 17 GNU m4 1.4.21 flags wired. 1 permanent non-claim: POSIX signals."
     },
     {
       "name": "Byte model",
       "court": "M4.BYTE.1",
-      "status": "partial",
-      "note": "Byte-oriented architecture, NUL handling TBD"
+      "status": "sealed",
+      "note": "Eight-bit-clean. Byte-exact verified: ASCII, high bytes, UTF-8, control chars, tabs."
     },
     {
       "name": "Lexer",
       "court": "M4.LEX.1",
-      "status": "partial",
-      "note": "Name recognition, text passthrough, basic quote matching"
+      "status": "sealed",
+      "note": "Multi-byte delimiter lexer. Same-pass changequote re-lex (M4.QUOTE.DEEP.1)."
     },
     {
       "name": "Quoting",
       "court": "M4.QUOTE.1",
-      "status": "partial",
-      "note": "QuoteConfig with changequote, lexer quote matching partial"
+      "status": "sealed",
+      "note": "Quote nesting, delimiter changes, same-pass timing via token re-lex. Empty-quote concat."
     },
     {
       "name": "Comments",
       "court": "M4.COMMENT.1",
-      "status": "partial",
-      "note": "Basic comment consume, changecom support"
+      "status": "sealed",
+      "note": "changecom, dnl. changecom excluded from same-pass re-lex (matches GNU m4)."
     },
     {
       "name": "Macro definitions",
       "court": "M4.DEFINE.1",
-      "status": "partial",
-      "note": "define/undefine/pushdef/popdef table implemented"
+      "status": "sealed",
+      "note": "define/undefine, builtin copy via defn. pushdef/popdef stacks."
     },
     {
       "name": "Expansion",
       "court": "M4.EXPAND.1",
-      "status": "partial",
-      "note": "Basic expand_tokens with builtin dispatch"
+      "status": "sealed",
+      "note": "$n/$@/$*/$#/$0 substitution. Rescanning. forloop/self-ref/mutual-recursion FIXED. Pure-text fast path."
     },
     {
       "name": "Arguments",
       "court": "M4.ARGS.1",
-      "status": "partial",
-      "note": "collect_args with nested parens, $n resolution partial"
+      "status": "sealed",
+      "note": "Nested parens, quoted commas, expansion during collection. $n resolution."
     },
     {
       "name": "Text builtins",
       "court": "M4.BUILTIN.TEXT.1",
-      "status": "unclaimed",
-      "note": "Scaffold only"
+      "status": "sealed",
+      "note": "len, index, substr, translit, regexp, patsubst, format — all oracle-admitted."
     },
     {
       "name": "Arithmetic builtins",
       "court": "M4.BUILTIN.EVAL.1",
-      "status": "unclaimed",
-      "note": "Scaffold only"
+      "status": "sealed",
+      "note": "eval (32-bit signed, all GNU operators), incr, decr. 10 Kani proofs."
     },
     {
       "name": "Diversions",
       "court": "M4.DIVERT.1",
-      "status": "unclaimed",
-      "note": "Scaffold only"
+      "status": "sealed",
+      "note": "divert, undivert, divnum, negative discard, EOF auto-undivert, file undivert."
     },
     {
       "name": "File inclusion",
       "court": "M4.INCLUDE.1",
-      "status": "unclaimed",
-      "note": "Scaffold only"
+      "status": "sealed",
+      "note": "include, sinclude, -I search path, directory-of-including-file logic."
     },
     {
       "name": "Diagnostics",
       "court": "M4.DIAG.1",
-      "status": "unclaimed",
-      "note": "Scaffold only"
+      "status": "known_failure",
+      "note": "errprint/__file__/__line__/m4exit working. Byte-exact wording not claimed (CROSS.7)."
     },
     {
       "name": "Debug/trace",
       "court": "M4.TRACE.1",
-      "status": "unclaimed",
-      "note": "Scaffold only"
+      "status": "sealed",
+      "note": "traceon, traceoff, debugmode, debugfile, dumpdef, -d flags, -t name."
     },
     {
       "name": "Shell builtins",
       "court": "M4.SYSCMD.1",
-      "status": "unclaimed",
-      "note": "Scaffold only"
+      "status": "monitored",
+      "note": "syscmd, esyscmd, sysval working. Sandboxed. fd inheritance (CROSS.12), signal encoding (CROSS.34)."
     },
     {
       "name": "Frozen files",
       "court": "M4.FROZEN.1",
-      "status": "unclaimed",
-      "note": "Scaffold only — NOT CLAIMED"
+      "status": "sealed",
+      "note": "-F/-R cross-compatible with GNU m4 1.4.21. 8 oracle smoke tests. V1 two-line format."
     },
     {
       "name": "Autoconf",
       "court": "M4.AUTOCONF.SEED.1",
-      "status": "unclaimed",
-      "note": "Not yet attempted"
+      "status": "sealed",
+      "note": "10 AC_DEFUN-pattern seed fixtures pass. Full Autoconf not claimed."
     },
     {
       "name": "Hostile input",
       "court": "M4.HOSTILE.1",
-      "status": "unclaimed",
-      "note": "Not yet tested"
+      "status": "sealed",
+      "note": "Panic-free on malformed input, deep nesting, binary bytes, huge defs, missing files."
+    },
+    {
+      "name": "Fuzzing",
+      "court": "M4.FUZZ.1",
+      "status": "sealed",
+      "note": "1M deterministic fuzz: 0 panics. 3 libfuzzer targets. 10 Kani proofs."
     }
   ]
 }

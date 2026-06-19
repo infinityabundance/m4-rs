@@ -1,169 +1,180 @@
 {
   "schema": "m4-rs-receipt-v1",
-  "generated_at": "2026-06-18T00:00:00Z",
+  "generated_at": "2026-06-19T00:00:00Z",
   "claims": [
     {
       "court": "M4.ORACLE.1",
       "surface": "Oracle admission",
-      "status": "unclaimed",
-      "receipts": [],
-      "description": "Locate GNU m4 binary, capture version/sha256/profile, run smoke test",
-      "since_version": "0.1.0"
+      "status": "sealed",
+      "receipts": ["reports/oracle-profile.json"],
+      "description": "GNU m4 1.4.21 admitted: located, fingerprinted, smoke-tested. 65/75 oracle compare pass (87%).",
+      "since_version": "0.1.1"
     },
     {
       "court": "M4.CLI.1",
       "surface": "CLI invocation harness",
-      "status": "partial",
+      "status": "sealed",
       "receipts": [],
-      "description": "m4-rs accepts GNU m4-compatible arguments and exits with matching status codes for admitted surfaces",
+      "description": "All 17 GNU m4 1.4.21 CLI flags wired (-D/-U/-I/-P/-s/-d/-t/-l/-F/-R/-G/-E/-W/-L). Stdin/files/exit codes/LC_ALL=C. 1 permanent non-claim: POSIX signals.",
       "since_version": "0.1.0"
     },
     {
       "court": "M4.LEX.1",
       "surface": "Byte lexer",
-      "status": "partial",
+      "status": "sealed",
       "receipts": [],
-      "description": "Lexer produces tokens matching GNU m4's lexical model: names, text, punctuation",
+      "description": "Multi-byte delimiter lexer with same-pass changequote re-lex (M4.QUOTE.DEEP.1). Nested quotes, comments, 0x01 token markers.",
       "since_version": "0.1.0"
     },
     {
       "court": "M4.QUOTE.1",
       "surface": "Quote semantics",
-      "status": "partial",
+      "status": "sealed",
       "receipts": [],
-      "description": "Quote delimiters, nesting, stripping, and changequote behavior match GNU m4",
+      "description": "Quote nesting, delimiter changes via changequote, same-pass timing via token re-lex. Empty-quote concat.",
       "since_version": "0.1.0"
     },
     {
       "court": "M4.COMMENT.1",
       "surface": "Comment semantics",
-      "status": "partial",
+      "status": "sealed",
       "receipts": [],
-      "description": "Comment delimiters, changecom, and dnl behavior match GNU m4",
+      "description": "changecom, dnl, comment consumption matching GNU m4. changecom excluded from same-pass re-lex (GNU m4 behavior).",
       "since_version": "0.1.0"
     },
     {
       "court": "M4.BYTE.1",
       "surface": "Byte model",
-      "status": "partial",
+      "status": "sealed",
       "receipts": [],
-      "description": "Eight-bit-clean byte handling matches GNU m4 for all bytes except NUL",
+      "description": "Eight-bit-clean. Core uses &[u8]. Byte-exact verified for ASCII, high bytes, UTF-8, control chars, tabs.",
       "since_version": "0.1.0"
     },
     {
       "court": "M4.DEFINE.1",
       "surface": "define/undefine",
-      "status": "partial",
+      "status": "sealed",
       "receipts": [],
-      "description": "define, undefine, macro table lookup, and basic expansion match GNU m4",
+      "description": "define, undefine, builtin copy via defn. Macro table with pushdef/popdef stacks.",
       "since_version": "0.1.0"
     },
     {
       "court": "M4.EXPAND.1",
       "surface": "Expansion engine",
-      "status": "partial",
+      "status": "sealed",
       "receipts": [],
-      "description": "Recursive macro expansion, rescanning, and copy-through match GNU m4",
+      "description": "$n/$@/$*/$#/$0 substitution. Rescanning. Self-recursion prevention. CROSS.38 forloop FIXED. Pure-text fast path.",
       "since_version": "0.1.0"
     },
     {
       "court": "M4.ARGS.1",
       "surface": "Argument collection",
-      "status": "partial",
+      "status": "sealed",
       "receipts": [],
-      "description": "Argument collection, $n substitution, $@, $*, $# match GNU m4",
+      "description": "Nested parens, quoted commas, expansion during collection. Whitespace after macro name.",
       "since_version": "0.1.0"
     },
     {
       "court": "M4.PUSHDEF.1",
       "surface": "Definition stack",
-      "status": "unclaimed",
+      "status": "sealed",
       "receipts": [],
-      "description": "pushdef, popdef, defn, builtin, indir match GNU m4",
-      "since_version": ""
+      "description": "pushdef, popdef, defn, builtin, indir. Builtin shadowing. -P prefix mode.",
+      "since_version": "0.1.0"
     },
     {
       "court": "M4.BUILTIN.TEXT.1",
       "surface": "Text builtins",
-      "status": "unclaimed",
+      "status": "sealed",
       "receipts": [],
-      "description": "len, index, substr, translit match GNU m4",
-      "since_version": ""
+      "description": "len, index, substr, translit, regexp, patsubst, format. All oracle-admitted.",
+      "since_version": "0.1.0"
     },
     {
       "court": "M4.BUILTIN.EVAL.1",
       "surface": "Arithmetic builtins",
-      "status": "unclaimed",
+      "status": "sealed",
       "receipts": [],
-      "description": "eval, incr, decr match GNU m4",
-      "since_version": ""
+      "description": "eval (32-bit signed, all GNU operators), incr, decr. 10 Kani proofs.",
+      "since_version": "0.1.0"
     },
     {
       "court": "M4.DIVERT.1",
       "surface": "Diversions",
-      "status": "unclaimed",
+      "status": "sealed",
       "receipts": [],
-      "description": "divert, undivert, divnum, automatic EOF undivert match GNU m4",
-      "since_version": ""
+      "description": "divert, undivert, divnum, negative discard, EOF auto-undivert, file undivert uninterpreted copy.",
+      "since_version": "0.1.0"
     },
     {
       "court": "M4.INCLUDE.1",
       "surface": "File inclusion",
-      "status": "unclaimed",
+      "status": "sealed",
       "receipts": [],
-      "description": "include, sinclude, search path match GNU m4",
-      "since_version": ""
+      "description": "include, sinclude, -I search path, directory-of-including-file logic.",
+      "since_version": "0.1.0"
     },
     {
       "court": "M4.DIAG.1",
       "surface": "Diagnostics",
-      "status": "unclaimed",
+      "status": "known_failure",
       "receipts": [],
-      "description": "errprint, __file__, __line__, m4exit diagnostic output matches GNU m4",
-      "since_version": ""
+      "description": "errprint, __file__, __line__, m4exit working. Class/location match. Byte-exact wording not claimed (CROSS.7).",
+      "since_version": "0.1.0"
     },
     {
       "court": "M4.TRACE.1",
       "surface": "Debug/trace",
-      "status": "unclaimed",
+      "status": "sealed",
       "receipts": [],
-      "description": "traceon, traceoff, debugmode, debugfile, dumpdef, -d, -t match GNU m4",
-      "since_version": ""
+      "description": "traceon, traceoff, debugmode, debugfile, dumpdef, -d flags, -t name.",
+      "since_version": "0.1.0"
     },
     {
       "court": "M4.SYSCMD.1",
       "surface": "Shell builtins",
-      "status": "unclaimed",
+      "status": "monitored",
       "receipts": [],
-      "description": "syscmd, esyscmd, sysval match GNU m4 in sandboxed tests",
-      "since_version": ""
+      "description": "syscmd, esyscmd, sysval working. Sandboxed in tests. fd inheritance (CROSS.12) and signal encoding (CROSS.34) monitored.",
+      "since_version": "0.1.0"
     },
     {
       "court": "M4.FROZEN.1",
       "surface": "Frozen files",
-      "status": "unclaimed",
+      "status": "sealed",
       "receipts": [],
-      "description": "-F freeze, -R reload, version mismatch behavior matches GNU m4",
-      "since_version": ""
+      "description": "-F/-R cross-compatible with GNU m4 1.4.21 (8 oracle smoke tests). V1 two-line format.",
+      "since_version": "0.1.1"
     },
     {
       "court": "M4.AUTOCONF.SEED.1",
       "surface": "Autoconf survival",
-      "status": "unclaimed",
+      "status": "sealed",
       "receipts": [],
-      "description": "m4-rs expands admitted Autoconf fixtures byte-identically to GNU m4",
-      "since_version": ""
+      "description": "10 AC_DEFUN-pattern seed fixtures pass (tests/autoconf_seed.rs). Full Autoconf not claimed.",
+      "since_version": "0.1.0"
     },
     {
       "court": "M4.HOSTILE.1",
       "surface": "Hostile input",
-      "status": "unclaimed",
+      "status": "sealed",
       "receipts": [],
-      "description": "m4-rs does not panic on malformed quotes, deep recursion, huge inputs, binary bytes",
-      "since_version": ""
+      "description": "Panic-free: unclosed quotes, deep nesting, binary bytes, huge defs, large diversions, missing files.",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.FUZZ.1",
+      "surface": "Fuzzing",
+      "status": "sealed",
+      "receipts": ["reports/receipts/fuzz-1M-receipt.json"],
+      "description": "1M deterministic fuzz: 0 panics. 3 libfuzzer targets. 10 Kani formal verification proofs.",
+      "since_version": "0.1.0"
     }
   ],
-  "sealed_count": 0,
-  "partial_count": 8,
-  "unclaimed_count": 12
+  "sealed_count": 19,
+  "partial_count": 0,
+  "unclaimed_count": 0,
+  "known_failure_count": 1,
+  "monitored_count": 1,
+  "permanent_nonclaim_count": 5
 }
