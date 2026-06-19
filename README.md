@@ -4,8 +4,6 @@
 
 `m4-rs` is a clean-room behavioral reconstruction of GNU m4. Each supported surface is admitted only after byte comparison against a pinned GNU m4 oracle. Unsupported surfaces are explicit non-claims.
 
-**Author:** infinityabundance <255699974+infinityabundance@users.noreply.github.com>
-
 New here? Start with [`docs/REVIEW-IN-10-MINUTES.md`](docs/REVIEW-IN-10-MINUTES.md).
 
 ## Status
