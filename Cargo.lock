@@ -107,16 +107,17 @@ dependencies = [
 
 [[package]]
 name = "m4-rs"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "m4-casefile-rs",
  "m4-oracle-rs",
+ "m4-rs-cli",
  "m4-rs-core",
 ]
 
 [[package]]
 name = "m4-rs-cli"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "m4-rs-core",
 ]

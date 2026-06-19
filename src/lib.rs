@@ -1,8 +1,7 @@
-//! `m4-rs` — forensic-parity GNU m4 reimplementation (workspace umbrella crate).
-//!
-//! Re-exports the workspace member crates: the macro engine [`m4_rs_core`], the GNU m4 oracle
-//! admission crate [`m4_oracle_rs`], and receipt/casefile types [`m4_casefile_rs`]. The `m4-rs`
-//! command-line binary lives in the `m4-rs-cli` member crate.
+//! `m4-rs` — forensic-parity GNU m4 reimplementation. The workspace crate: it ships the `m4-rs`
+//! CLI binary and re-exports the member crates so `cargo install m4-rs` gives the tool and
+//! `cargo add m4-rs` gives the engine.
 pub use m4_casefile_rs;
 pub use m4_oracle_rs;
+pub use m4_rs_cli;
 pub use m4_rs_core;

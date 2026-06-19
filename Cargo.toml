@@ -1,6 +1,6 @@
 [package]
 name = "m4-rs"
-version.workspace = true
+version = "0.1.1"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
@@ -13,10 +13,15 @@ categories = ["command-line-utilities", "parser-implementations"]
 [lib]
 path = "src/lib.rs"
 
+[[bin]]
+name = "m4-rs"
+path = "src/main.rs"
+
 [dependencies]
 m4-rs-core = { version = "0.1.0", path = "crates/m4-rs-core" }
 m4-oracle-rs = { version = "0.1.0", path = "crates/m4-oracle-rs" }
 m4-casefile-rs = { version = "0.1.0", path = "crates/m4-casefile-rs" }
+m4-rs-cli = { version = "0.1.1", path = "crates/m4-rs-cli" }
 
 [workspace]
 resolver = "2"
