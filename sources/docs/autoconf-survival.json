@@ -1,0 +1,14 @@
+{"schema":"m4-rs-structured-doc-v1","title":"Autoconf Survival","sections":[
+{"type":"paragraph","text":"Autoconf is the real-world pressure test for m4 compatibility."},
+{"type":"heading","level":2,"text":"Survival Ladder"},
+{"type":"table","headers":["Stage","Status"],"rows":[
+["A: Seed Macros","✅ DONE — 10 fixtures pass (tests/autoconf_seed.rs)"],
+["B: Macro Files","Not yet attempted (requires QEMU VM)"],
+["C: Autoconf Invocations","Not yet attempted"],
+["D: Configure Generation","Not yet attempted"],
+["E: Configure Execution","Not yet attempted"]
+]},
+{"type":"heading","level":2,"text":"Claim Precision"},
+{"type":"paragraph","text":"Allowed: \"m4-rs passes Stage A seed fixtures (10/10)\". Forbidden: \"m4-rs supports Autoconf\"."},
+{"type":"paragraph","text":"M4.AUTOCONF.SEED.1 is admitted for 10 seed fixtures. Full Autoconf compatibility not claimed."}
+]}

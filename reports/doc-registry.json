@@ -1,0 +1,209 @@
+{
+  "schema": "m4-rs-doc-registry-v1",
+  "documents": [
+    {
+      "sources": [
+        "sources/gaps/master-gap-analysis.json"
+      ],
+      "source_sha256s": [
+        "6d468b5e4b12c7b9171efd6770c9aa3fd5fe6cc5a6730f623dd76f478c553cf4"
+      ],
+      "output": "reports/FORENSIC-GAP-ANALYSIS.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:c2b850cea938141d9b9a8b12440b5ac03b9e8a985874947b74c42dcf9b3c34e2",
+      "source_schema": "m4-rs-gap-v3"
+    },
+    {
+      "sources": [
+        "sources/negcaps/structured-negative-capabilities.json"
+      ],
+      "source_sha256s": [
+        "6cdc94a438eb95afe64551d2196b394a06bd796fe7a30bea6f044b34a038e88a"
+      ],
+      "output": "docs/negative-capabilities.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:7f4d4ea18cd48b041d40ef6f0723a16c607ef975d41b0eaac962d97ec26ea487",
+      "source_schema": "m4-rs-negcaps-v2"
+    },
+    {
+      "sources": [
+        "sources/gaps/needle-metrics.json"
+      ],
+      "source_sha256s": [
+        "9b8c923cbdda4c5338729461b6a3f104721a66eca5c8d0688fb007748bf96c05"
+      ],
+      "output": "reports/NEEDLE-REPORT.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:a8ee52d87678e92899eb648543b0e3e897a81a92ba2717f2619537995cc110e7",
+      "source_schema": "m4-rs-needle-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/status.json"
+      ],
+      "source_sha256s": [
+        "1c862f10355f61db06256644e7a90f9a9285505b8c4891a58f7f2538b693933b"
+      ],
+      "output": "STATUS.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:a5e1019246cb1b0292c4a71227a5f6bfb736501135ec83d73124e23d6b20fe1a",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/compatibility.json"
+      ],
+      "source_sha256s": [
+        "05e13916fa4bf582022f2adb5d7e3fcc8e984b2b291a79c6b1ec2046dfc4691e"
+      ],
+      "output": "docs/compatibility.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:6ea208c7d98ab3d180580aff069a30895028dca1aadd866b727b425512e6f4fc",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/parity-ladder.json"
+      ],
+      "source_sha256s": [
+        "54fcbf2ae48a6e20a5dc25e681d148e1f22d0c9c22ba338c5c66bed157aa5659"
+      ],
+      "output": "docs/parity-ladder.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:26d5fca099957191b4329ef105e5c96e4fb43728d46eb4fac0e2feab58447618",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/autoconf-survival.json"
+      ],
+      "source_sha256s": [
+        "e60ece36f7b6b656f65f13418e2dba9618fea1c8ea71b493bb3be1c56d1dfe56"
+      ],
+      "output": "docs/autoconf-survival.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:e57d135f38fea526d6d8a0c010b2b3956d64738500665728c81d636c7fb18613",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/diagnostics.json"
+      ],
+      "source_sha256s": [
+        "5e0a9762b84b99ff60aaef58366b78523834f6a4f1363a455a95fef30bbdb308"
+      ],
+      "output": "docs/diagnostics.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:76e4b2a124c9d4a01d8c7a55f46597aac2253568584e386170cee657704c3874",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/oracle-profile.json"
+      ],
+      "source_sha256s": [
+        "5ddc41cfde637e80cc70f6aeac69fbf6b928e1f2cd62d56fd89466547a6bfa44"
+      ],
+      "output": "docs/oracle-profile.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:85d58c35e27ce79a5e5c2796b8fe93cc637bd0f9da68864f884dd71b015ff219",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/filesystem-effects.json"
+      ],
+      "source_sha256s": [
+        "a963135fcb7abba3ef90013742de42dbba066d30e10950588a18b718c7669b50"
+      ],
+      "output": "docs/filesystem-effects.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:b0be0c7ae0285afd4acb4378498a97795e1fb4768824cfd2fb3955d046cfbbab",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/process-effects.json"
+      ],
+      "source_sha256s": [
+        "70dfb45f180caab819cfebf66df3f126a41b201bb1e75bea4e5fc6969db3ad5a"
+      ],
+      "output": "docs/process-effects.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:2641e8a7a956dd171afd0f7c390330e717e96c3d28a7761c2067703c9896843f",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/gaps/needle-metrics.json"
+      ],
+      "source_sha256s": [
+        "9b8c923cbdda4c5338729461b6a3f104721a66eca5c8d0688fb007748bf96c05"
+      ],
+      "output": "docs/REVIEW-IN-10-MINUTES.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:3a456d17dd46247068c016605de10c34b0d951b45275f34a014e419c3fb08c01",
+      "source_schema": "m4-rs-needle-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/crate-readme-core.json"
+      ],
+      "source_sha256s": [
+        "f8f792b2b4a2255d06e295fcfdab72440316e2a6acb74eafe8abdc0e78964e8b"
+      ],
+      "output": "crates/m4-rs-core/README.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:0f2a996ced9908112ab7ed6388631ca9b946e268ad983bbfbb8891927785f8c8",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/crate-readme-cli.json"
+      ],
+      "source_sha256s": [
+        "bad8f593b603de2e2955080d47d4d3fdab66ee7314242a6ace5382ed9beb39d9"
+      ],
+      "output": "crates/m4-rs-cli/README.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:2c1d11277eca88c49a4ebacd6efc828c1be529cdadfb732eb5f2d7bd54d59915",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/crate-readme-oracle.json"
+      ],
+      "source_sha256s": [
+        "942cee69c53f41887fd4be39c4dc16483d7f8b4e12c70683ee41d7bf8de6a0de"
+      ],
+      "output": "crates/m4-oracle-rs/README.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:a686ec695def0624e9e8c81a18de1bf053e5b9e439ce3370a94334c6d4b269d0",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/crate-readme-casefile.json"
+      ],
+      "source_sha256s": [
+        "82f5cc8eaeac8e1793ca2657e6593401f3c9c8e52e3f136fa1002d3f90c6b8ec"
+      ],
+      "output": "crates/m4-casefile-rs/README.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:1df3b82fe04021668725e39841ac6ddda9586b00eea99fd6c3e375e26dfad0a3",
+      "source_schema": "m4-rs-structured-doc-v1"
+    },
+    {
+      "sources": [
+        "sources/docs/crate-readme-xtask.json"
+      ],
+      "source_sha256s": [
+        "879fd9c534a2702cf41533d9d827f685083edd85ef3b82fcdf706b40b6254378"
+      ],
+      "output": "xtask/README.md",
+      "generated_at": 1781835457,
+      "dsse_signature": "sha256:769c14e9e42539f62971d3f2a21bf5abc46ac40e71bd2e209311400252de9d03",
+      "source_schema": "m4-rs-structured-doc-v1"
+    }
+  ]
+}

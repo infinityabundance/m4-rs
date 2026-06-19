@@ -1,0 +1,47 @@
+{
+  "overall_ratio": 1.9910427623771043,
+  "schema": "m4-rs-perf-baseline-v1",
+  "timestamp": "2026-06-19T01:33:21Z",
+  "workloads": [
+    {
+      "input_bytes": 21,
+      "name": "tiny-define"
+    },
+    {
+      "input_bytes": 2100,
+      "name": "100-defines"
+    },
+    {
+      "input_bytes": 21000,
+      "name": "1k-defines"
+    },
+    {
+      "input_bytes": 210000,
+      "name": "10k-defines"
+    },
+    {
+      "input_bytes": 54,
+      "name": "nested-define"
+    },
+    {
+      "input_bytes": 78,
+      "name": "ifelse-chain"
+    },
+    {
+      "input_bytes": 27000,
+      "name": "eval-heavy"
+    },
+    {
+      "input_bytes": 12800,
+      "name": "divert-fill"
+    },
+    {
+      "input_bytes": 196,
+      "name": "forloop-10"
+    },
+    {
+      "input_bytes": 18,
+      "name": "tiny-copy"
+    }
+  ]
+}

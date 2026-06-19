@@ -1,0 +1,97 @@
+            "ifdef" => {
+                if let Some(ref a) = args {
+                    let name = a.get(1);
+                    if self.macro_table.is_defined(name) {
+                        if a.len() >= 2 {
+                            self.expand_user_macro(a.get(2), a);
+                        }
+                    } else if a.len() >= 3 {
+                        self.expand_user_macro(a.get(3), a);
+                    }
+                }
+            }
+            "ifelse" => {
+                if let Some(ref a) = args {
+                    let n = a.len();
+                    if n == 1 {
+                        self.expand_user_macro(a.get(1), a);
+                    } else if n >= 3 {
+                        let mut i = 1;
+                        while i + 1 < n {
+                            let s1 = a.get(i);
+                            let s2 = a.get(i + 1);
+                            if s1 == s2 {
+                                if i + 2 <= n {
+                                    self.expand_user_macro(a.get(i + 2), a);
+                                }
+                                return self.skip_args(tokens, pos, has_args, def.is_blind);
+                            }
+                            i += 3;
+                        }
+                        if i <= n {
+                            self.expand_user_macro(a.get(i), a);
+                        }
+                    }
+                }
+            }
+            "shift" => {
+                if let Some(ref a) = args {
+                    if a.len() >= 1 {
+                        let mut result = Vec::new();
+                        for j in 2..=a.len() {
+                            if j > 2 { result.push(b','); }
+                            result.extend_from_slice(a.get(j));
+                        }
+                        if !result.is_empty() {
+                            let mut lexer = Lexer::new();
+                            lexer.quote_config = self.quote_config.clone();
+                            let new_tokens = lexer.tokenize(&result);
+                            self.expand_tokens_inner(&new_tokens);
+                        }
+                    }
+                }
+            }
+            "divert" => {
+                if let Some(ref a) = args {
+                    if a.len() >= 1 && !a.get(1).is_empty() {
+                        let num_str = String::from_utf8_lossy(a.get(1));
+                        if let Ok(num) = num_str.trim().parse::<i32>() {
+                            self.current_diversion = num;
+                        }
+                    } else {
+                        self.current_diversion = 0;
+                    }
+                } else {
+                    self.current_diversion = 0;
+                }
+            }
+            "undivert" => {
+                if let Some(ref a) = args {
+                    if a.len() == 0 || (a.len() == 1 && a.get(1).is_empty()) {
+                        self.undivert_all();
+                    } else {
+                        for j in 1..=a.len() {
+                            let arg = a.get(j);
+                            let arg_str = String::from_utf8_lossy(arg);
+                            if let Ok(num) = arg_str.trim().parse::<i32>() {
+                                if num != self.current_diversion && num != 0 {
+                                    if let Some(buf) = self.diversions.remove(&num) {
+                                        self.output.extend_from_slice(&buf);
+                                    }
+                                }
+                            } else {
+                                let path = std::path::Path::new(arg_str.trim());
+                                if let Ok(data) = std::fs::read(path) {
+                                    self.emit(&data);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    self.undivert_all();
+                }
+            }
+            "divnum" => {
+                let num_str = format!("{}", self.current_diversion);
+                self.emit(num_str.as_bytes());
+            }

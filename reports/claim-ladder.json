@@ -1,0 +1,169 @@
+{
+  "schema": "m4-rs-receipt-v1",
+  "generated_at": "2026-06-18T00:00:00Z",
+  "claims": [
+    {
+      "court": "M4.ORACLE.1",
+      "surface": "Oracle admission",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "Locate GNU m4 binary, capture version/sha256/profile, run smoke test",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.CLI.1",
+      "surface": "CLI invocation harness",
+      "status": "partial",
+      "receipts": [],
+      "description": "m4-rs accepts GNU m4-compatible arguments and exits with matching status codes for admitted surfaces",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.LEX.1",
+      "surface": "Byte lexer",
+      "status": "partial",
+      "receipts": [],
+      "description": "Lexer produces tokens matching GNU m4's lexical model: names, text, punctuation",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.QUOTE.1",
+      "surface": "Quote semantics",
+      "status": "partial",
+      "receipts": [],
+      "description": "Quote delimiters, nesting, stripping, and changequote behavior match GNU m4",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.COMMENT.1",
+      "surface": "Comment semantics",
+      "status": "partial",
+      "receipts": [],
+      "description": "Comment delimiters, changecom, and dnl behavior match GNU m4",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.BYTE.1",
+      "surface": "Byte model",
+      "status": "partial",
+      "receipts": [],
+      "description": "Eight-bit-clean byte handling matches GNU m4 for all bytes except NUL",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.DEFINE.1",
+      "surface": "define/undefine",
+      "status": "partial",
+      "receipts": [],
+      "description": "define, undefine, macro table lookup, and basic expansion match GNU m4",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.EXPAND.1",
+      "surface": "Expansion engine",
+      "status": "partial",
+      "receipts": [],
+      "description": "Recursive macro expansion, rescanning, and copy-through match GNU m4",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.ARGS.1",
+      "surface": "Argument collection",
+      "status": "partial",
+      "receipts": [],
+      "description": "Argument collection, $n substitution, $@, $*, $# match GNU m4",
+      "since_version": "0.1.0"
+    },
+    {
+      "court": "M4.PUSHDEF.1",
+      "surface": "Definition stack",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "pushdef, popdef, defn, builtin, indir match GNU m4",
+      "since_version": ""
+    },
+    {
+      "court": "M4.BUILTIN.TEXT.1",
+      "surface": "Text builtins",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "len, index, substr, translit match GNU m4",
+      "since_version": ""
+    },
+    {
+      "court": "M4.BUILTIN.EVAL.1",
+      "surface": "Arithmetic builtins",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "eval, incr, decr match GNU m4",
+      "since_version": ""
+    },
+    {
+      "court": "M4.DIVERT.1",
+      "surface": "Diversions",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "divert, undivert, divnum, automatic EOF undivert match GNU m4",
+      "since_version": ""
+    },
+    {
+      "court": "M4.INCLUDE.1",
+      "surface": "File inclusion",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "include, sinclude, search path match GNU m4",
+      "since_version": ""
+    },
+    {
+      "court": "M4.DIAG.1",
+      "surface": "Diagnostics",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "errprint, __file__, __line__, m4exit diagnostic output matches GNU m4",
+      "since_version": ""
+    },
+    {
+      "court": "M4.TRACE.1",
+      "surface": "Debug/trace",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "traceon, traceoff, debugmode, debugfile, dumpdef, -d, -t match GNU m4",
+      "since_version": ""
+    },
+    {
+      "court": "M4.SYSCMD.1",
+      "surface": "Shell builtins",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "syscmd, esyscmd, sysval match GNU m4 in sandboxed tests",
+      "since_version": ""
+    },
+    {
+      "court": "M4.FROZEN.1",
+      "surface": "Frozen files",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "-F freeze, -R reload, version mismatch behavior matches GNU m4",
+      "since_version": ""
+    },
+    {
+      "court": "M4.AUTOCONF.SEED.1",
+      "surface": "Autoconf survival",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "m4-rs expands admitted Autoconf fixtures byte-identically to GNU m4",
+      "since_version": ""
+    },
+    {
+      "court": "M4.HOSTILE.1",
+      "surface": "Hostile input",
+      "status": "unclaimed",
+      "receipts": [],
+      "description": "m4-rs does not panic on malformed quotes, deep recursion, huge inputs, binary bytes",
+      "since_version": ""
+    }
+  ],
+  "sealed_count": 0,
+  "partial_count": 8,
+  "unclaimed_count": 12
+}

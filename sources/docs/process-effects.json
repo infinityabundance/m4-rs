@@ -1,0 +1,15 @@
+{"schema":"m4-rs-structured-doc-v1","title":"Process Effects","sections":[
+{"type":"heading","level":2,"text":"Shell Execution"},
+{"type":"table","headers":["Builtin","Behavior","Status"],"rows":[
+["syscmd(cmd)","Executes via /bin/sh -c, output to stdout","✅ Working"],
+["esyscmd(cmd)","Captures output as string","✅ Working"],
+["sysval","Returns last exit status","✅ Working"]
+]},
+{"type":"heading","level":2,"text":"Known Divergences"},
+{"type":"table","headers":["Divergence","Status"],"rows":[
+["fd inheritance (CROSS.12)","🔍 monitored"],
+["sysval signal encoding (CROSS.34)","🔴 not implemented"],
+["Shell path","🔍 monitored"]
+]},
+{"type":"paragraph","text":"M4.SYSCMD.1 is monitored. Sandboxed in tests. Full oracle parity not yet claimed."}
+]}

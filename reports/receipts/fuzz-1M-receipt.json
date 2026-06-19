@@ -1,0 +1,10 @@
+{
+  "iterations": 1000000,
+  "phase1_printable": 332840,
+  "phase2_m4_chars": 333780,
+  "phase3_binary": 333380,
+  "panics": 0,
+  "nondeterministic": 0,
+  "elapsed_secs": 26.805261564,
+  "seed": 16045690981097406465
+}

@@ -1,0 +1,114 @@
+{
+  "schema": "m4-rs-parity-matrix-v1",
+  "generated_at": "2026-06-18T00:00:00Z",
+  "axes": [
+    {
+      "name": "CLI invocation",
+      "court": "M4.CLI.1",
+      "status": "partial",
+      "note": "Basic argument parsing implemented"
+    },
+    {
+      "name": "Byte model",
+      "court": "M4.BYTE.1",
+      "status": "partial",
+      "note": "Byte-oriented architecture, NUL handling TBD"
+    },
+    {
+      "name": "Lexer",
+      "court": "M4.LEX.1",
+      "status": "partial",
+      "note": "Name recognition, text passthrough, basic quote matching"
+    },
+    {
+      "name": "Quoting",
+      "court": "M4.QUOTE.1",
+      "status": "partial",
+      "note": "QuoteConfig with changequote, lexer quote matching partial"
+    },
+    {
+      "name": "Comments",
+      "court": "M4.COMMENT.1",
+      "status": "partial",
+      "note": "Basic comment consume, changecom support"
+    },
+    {
+      "name": "Macro definitions",
+      "court": "M4.DEFINE.1",
+      "status": "partial",
+      "note": "define/undefine/pushdef/popdef table implemented"
+    },
+    {
+      "name": "Expansion",
+      "court": "M4.EXPAND.1",
+      "status": "partial",
+      "note": "Basic expand_tokens with builtin dispatch"
+    },
+    {
+      "name": "Arguments",
+      "court": "M4.ARGS.1",
+      "status": "partial",
+      "note": "collect_args with nested parens, $n resolution partial"
+    },
+    {
+      "name": "Text builtins",
+      "court": "M4.BUILTIN.TEXT.1",
+      "status": "unclaimed",
+      "note": "Scaffold only"
+    },
+    {
+      "name": "Arithmetic builtins",
+      "court": "M4.BUILTIN.EVAL.1",
+      "status": "unclaimed",
+      "note": "Scaffold only"
+    },
+    {
+      "name": "Diversions",
+      "court": "M4.DIVERT.1",
+      "status": "unclaimed",
+      "note": "Scaffold only"
+    },
+    {
+      "name": "File inclusion",
+      "court": "M4.INCLUDE.1",
+      "status": "unclaimed",
+      "note": "Scaffold only"
+    },
+    {
+      "name": "Diagnostics",
+      "court": "M4.DIAG.1",
+      "status": "unclaimed",
+      "note": "Scaffold only"
+    },
+    {
+      "name": "Debug/trace",
+      "court": "M4.TRACE.1",
+      "status": "unclaimed",
+      "note": "Scaffold only"
+    },
+    {
+      "name": "Shell builtins",
+      "court": "M4.SYSCMD.1",
+      "status": "unclaimed",
+      "note": "Scaffold only"
+    },
+    {
+      "name": "Frozen files",
+      "court": "M4.FROZEN.1",
+      "status": "unclaimed",
+      "note": "Scaffold only — NOT CLAIMED"
+    },
+    {
+      "name": "Autoconf",
+      "court": "M4.AUTOCONF.SEED.1",
+      "status": "unclaimed",
+      "note": "Not yet attempted"
+    },
+    {
+      "name": "Hostile input",
+      "court": "M4.HOSTILE.1",
+      "status": "unclaimed",
+      "note": "Not yet tested"
+    }
+  ]
+}

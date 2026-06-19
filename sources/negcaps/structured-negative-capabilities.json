@@ -1,0 +1,72 @@
+{
+  "schema": "m4-rs-negcaps-v2",
+  "description": "Structured negative capabilities. Every non-claim is enumerated, categorized, and justified. This is the build roadmap: knowing what doesn't work is how we plan what to build next.",
+  "categories": [
+    {
+      "id": "PERMANENT",
+      "label": "Permanent Non-Claims",
+      "desc": "These will never be claimed. They are design boundaries, not gaps.",
+      "items": [
+        {"id": "NC.PERM.1", "claim": "Not a GNU m4 replacement until all courts sealed", "justification": "Replacement claim requires 100% surface parity. This is the terminal goal, not a deferral.", "blocked_by": ["ALL_COURTS_SEALED"]},
+        {"id": "NC.PERM.2", "claim": "Not a security sandbox", "justification": "m4 is a macro processor, not a sandbox. syscmd/esyscmd execute arbitrary commands by design. This matches GNU m4 behavior.", "blocked_by": []},
+        {"id": "NC.PERM.3", "claim": "Unicode correctness not claimed", "justification": "GNU m4 is byte-oriented (eight-bit-clean). m4-rs follows this design: core operates on bytes, not Unicode.", "blocked_by": []},
+        {"id": "NC.PERM.4", "claim": "Performance parity not claimed", "justification": "Byte-exact behavior is the target, not wall-clock performance. Performance may be better or worse.", "blocked_by": []},
+        {"id": "NC.PERM.5", "claim": "Build-system compatibility not claimed", "justification": "Different build systems (autotools vs cargo). Output behavior is the only comparandum.", "blocked_by": []}
+      ]
+    },
+    {
+      "id": "PROFILE",
+      "label": "Profile-Bound Non-Claims",
+      "desc": "True for some m4 variants, not portable claims.",
+      "items": [
+        {"id": "NC.PROF.1", "claim": "Vendor m4 parity not claimed from GNU m4 parity", "justification": "A receipt against gnu_m4_1_4_20_default does not imply busybox_m4, bsd_m4, or system_m4 parity. Each is a separate profile.", "blocked_by": []},
+        {"id": "NC.PROF.2", "claim": "POSIX conformance not claimed", "justification": "GNU m4 extends POSIX significantly. Posix-mode requires separate admission.", "blocked_by": []},
+        {"id": "NC.PROF.3", "claim": "Not an Autoconf replacement", "justification": "Autoconf is a framework built on m4, not just macro expansion. Autoconf survival is a separate parity ladder.", "blocked_by": ["M4.AUTOCONF.SEED.1"]}
+      ]
+    },
+    {
+      "id": "DEFERRED",
+      "label": "Deferred Non-Claims",
+      "desc": "Will be claimed when dependencies are sealed. Each has a specific dependency chain.",
+      "items": [
+        {"id": "NC.DEF.1", "claim": "Frozen file parity not claimed", "justification": "Depends on: macro table (M4.DEFINE.1), diversion system (M4.DIVERT.1), quote/comment config serialization, pushdef stack serialization, version mismatch handling. Cannot be sealed before Phase 10.", "blocked_by": ["M4.DEFINE.1", "M4.DIVERT.1", "M4.QUOTE.1"], "target_phase": 10},
+        {"id": "NC.DEF.2", "claim": "Shell command parity not claimed", "justification": "Depends on: sandboxed test infrastructure, child process management, exit code capture, stderr passthrough semantics. syscmd/esyscmd/sysval all depend on each other.", "blocked_by": ["M4.SYSCMD.1"], "target_phase": 9},
+        {"id": "NC.DEF.3", "claim": "Diagnostic byte parity not claimed", "justification": "Depends on: i18n decisions (15 language translations), oracle version stability, errprint/__file__/__line__/m4exit implementation, full diagnostic taxonomy. Byte-exact diagnostic matching is the most version-sensitive surface.", "blocked_by": ["M4.DIAG.1"], "target_phase": 8},
+        {"id": "NC.DEF.4", "claim": "Resource-exhaustion resistance not claimed", "justification": "Will be tested in hostile/fuzz phases. Requires: recursion limit, input size limits, diversion buffer limits, panic-free error paths.", "blocked_by": ["M4.HOSTILE.1", "M4.FUZZ.1"], "target_phase": 12},
+        {"id": "NC.DEF.5", "claim": "Autoconf survival not claimed", "justification": "Multi-stage ladder: seed macros → macro files → autom4te invocation → configure generation → configure execution. Depends on virtually all builtins being sealed first.", "blocked_by": ["ALL_BUILTINS_SEALED", "M4.FROZEN.1", "M4.DIVERT.1"], "target_phase": 11},
+        {"id": "NC.DEF.6", "claim": "Trace/debug parity not claimed", "justification": "Depends on: full expansion engine, line tracking, debug flags, dumpdef, output redirection.", "blocked_by": ["M4.EXPAND.1", "M4.INPUT.1"], "target_phase": 8}
+      ]
+    },
+    {
+      "id": "UNIMPLEMENTED",
+      "label": "Unimplemented Surfaces",
+      "desc": "Not yet started. These are the active implementation targets.",
+      "items": [
+        {"id": "NC.UNIMPL.1", "claim": "eval/incr/decr arithmetic not implemented", "builds_on": [], "target_court": "M4.BUILTIN.EVAL.1", "complexity": "high"},
+        {"id": "NC.UNIMPL.2", "claim": "format builtin not implemented", "builds_on": [], "target_court": "M4.BUILTIN.FORMAT.1", "complexity": "medium"},
+        {"id": "NC.UNIMPL.3", "claim": "Text builtins (len/index/substr/translit/regexp/patsubst) not implemented", "builds_on": ["regex engine for regexp/patsubst"], "target_court": "M4.BUILTIN.TEXT.1", "complexity": "medium"},
+        {"id": "NC.UNIMPL.4", "claim": "Diversion system not implemented", "builds_on": ["output buffering", "EOF undivert", "uninterpreted file copy"], "target_court": "M4.DIVERT.1", "complexity": "high"},
+        {"id": "NC.UNIMPL.5", "claim": "File inclusion (include/sinclude) not implemented", "builds_on": ["search path", "input stack", "rescanning"], "target_court": "M4.INCLUDE.1", "complexity": "medium"},
+        {"id": "NC.UNIMPL.6", "claim": "Conditional builtins (ifdef/ifelse/shift) not implemented", "builds_on": ["expansion engine", "argument handling"], "target_court": "M4.BUILTIN.COND.1", "complexity": "medium"},
+        {"id": "NC.UNIMPL.7", "claim": "Indirect calls (builtin/indir) not implemented", "builds_on": ["symbol table lookup", "builtin shadowing"], "target_court": "M4.PUSHDEF.1", "complexity": "medium"},
+        {"id": "NC.UNIMPL.8", "claim": "defn not implemented", "builds_on": ["pushdef stack", "quoted return value", "multi-name concatenation"], "target_court": "M4.PUSHDEF.1", "complexity": "low"},
+        {"id": "NC.UNIMPL.9", "claim": "Diagnostic builtins (errprint/__file__/__line__/m4exit/m4wrap) not implemented", "builds_on": ["line tracking", "exit code handling", "deferred expansion"], "target_court": "M4.DIAG.1", "complexity": "low"},
+        {"id": "NC.UNIMPL.10", "claim": "Shell builtins (syscmd/esyscmd/sysval/maketemp/mkstemp) not implemented", "builds_on": ["sandboxed test infra", "child process management"], "target_court": "M4.SYSCMD.1", "complexity": "medium"},
+        {"id": "NC.UNIMPL.11", "claim": "Syncline output (-s) not implemented", "builds_on": ["line tracking", "#line directive format"], "target_court": "M4.CLI.1", "complexity": "low"},
+        {"id": "NC.UNIMPL.12", "claim": "POSIX traditional mode (-G) not implemented", "builds_on": ["understanding of all POSIX vs GNU differences"], "target_court": "M4.CLI.1", "complexity": "high"}
+      ]
+    }
+  ],
+  "critical_implementation_sequence": [
+    "Fix lexer multi-byte delimiter scanning",
+    "Implement $0-$9, $#, $@, $* substitution",
+    "Implement proper rescanning",
+    "Implement quote stripping during expansion",
+    "Implement expansion during argument collection",
+    "Wire input stack, lexer, engine together",
+    "Implement diversion system (output.c parity)",
+    "Implement line number tracking",
+    "Implement eval arithmetic engine",
+    "Implement format builtin"
+  ]
+}

@@ -1,0 +1,14 @@
+[package]
+name = "m4-rs-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "CLI binary for m4-rs, the forensic-parity GNU m4 reimplementation."
+
+[[bin]]
+name = "m4-rs"
+path = "src/main.rs"
+
+[dependencies]
+m4-rs-core = { path = "../m4-rs-core", version = "0.1.0" }

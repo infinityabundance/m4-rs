@@ -1,0 +1,227 @@
+{
+  "schema": "m4-rs-cleanroom-receipt-v1",
+  "generated_at": "1781835565",
+  "source_tree_sha256": "17bb19b3775592b952c4799ba75f6dc4b69560b4090b4bc0a417db7a22e7f9d6",
+  "files_scanned": 44,
+  "errors": [],
+  "warnings": [],
+  "infos": [
+    {
+      "file": "crates/m4-rs-core/src/token.rs",
+      "line": 11,
+      "class": "Info",
+      "pattern": "m4_header_reference",
+      "matched": "m4.h",
+      "explanation": "References m4.h header. Acceptable in gap analysis, suspicious in implementation."
+    },
+    {
+      "file": "crates/m4-rs-core/src/quote.rs",
+      "line": 5,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "crates/m4-rs-core/src/stack.rs",
+      "line": 4,
+      "class": "Info",
+      "pattern": "c_source_file_reference",
+      "matched": "src/stackovf.c",
+      "explanation": "References a GNU m4 C source file. Acceptable in gap-analysis context, suspicious in implementation."
+    },
+    {
+      "file": "crates/m4-rs-core/src/lib.rs",
+      "line": 3,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic-parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "crates/m4-rs-core/src/lib.rs",
+      "line": 6,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic-parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "crates/m4-rs-core/src/lib.rs",
+      "line": 37,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic-parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "crates/m4-rs-core/src/frozen.rs",
+      "line": 12,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.20",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "crates/m4-rs-core/src/frozen.rs",
+      "line": 13,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.20",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "crates/m4-rs-core/src/frozen.rs",
+      "line": 34,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.20",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "crates/m4-rs-core/src/frozen.rs",
+      "line": 111,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.20",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "crates/m4-rs-core/src/frozen.rs",
+      "line": 112,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.20",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "crates/m4-rs-cli/src/main.rs",
+      "line": 2,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic-parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "crates/m4-rs-cli/src/main.rs",
+      "line": 50,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic-parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "crates/m4-rs-cli/src/main.rs",
+      "line": 297,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic-parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "crates/m4-oracle-rs/src/behavior_doc.rs",
+      "line": 9,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 manual",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "crates/m4-oracle-rs/src/behavior_doc.rs",
+      "line": 5,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic-parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "crates/m4-casefile-rs/src/lib.rs",
+      "line": 2,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "xtask/src/docgen/generate.rs",
+      "line": 652,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.21",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "xtask/src/docgen/generate.rs",
+      "line": 640,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic-parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "xtask/src/docgen/dsse.rs",
+      "line": 11,
+      "class": "Info",
+      "pattern": "forensic_parity_claim",
+      "matched": "forensic-parity",
+      "explanation": "Project methodology statement. Expected."
+    },
+    {
+      "file": "xtask/src/main.rs",
+      "line": 150,
+      "class": "Info",
+      "pattern": "clean_room_claim",
+      "matched": "clean-room",
+      "explanation": "Self-referential clean-room claim. Expected in project documentation."
+    },
+    {
+      "file": "xtask/src/compare.rs",
+      "line": 11,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 manual",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "kani/proofs_diversion.rs",
+      "line": 4,
+      "class": "Info",
+      "pattern": "c_source_file_reference",
+      "matched": "src/output.c",
+      "explanation": "References a GNU m4 C source file. Acceptable in gap-analysis context, suspicious in implementation."
+    },
+    {
+      "file": "crates/m4-rs-core/tests/gnu_test_suite.rs",
+      "line": 2,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.20",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "crates/m4-rs-core/tests/gnu_test_suite.rs",
+      "line": 4,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.20",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "crates/m4-rs-core/tests/gnu_test_suite.rs",
+      "line": 460,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.21",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    },
+    {
+      "file": "crates/m4-rs-core/tests/gnu_test_suite.rs",
+      "line": 674,
+      "class": "Info",
+      "pattern": "gnu_m4_version_reference",
+      "matched": "GNU m4 1.4.21",
+      "explanation": "References GNU m4 version. Expected — we document our oracle target."
+    }
+  ],
+  "verdict": "PASS"
+}

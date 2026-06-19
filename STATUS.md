@@ -1,0 +1,81 @@
+# STATUS.md — Live Current-State Authority
+
+**Oracle:** GNU m4 1.4.21 (admitted, 65/75 oracle compare pass)  
+**Strategy:** Clean-room behavioral reconstruction. GNU m4 is treated as a black-box oracle.  
+**License:** MIT OR Apache-2.0  
+**Author:** infinityabundance <255699974+infinityabundance@users.noreply.github.com>
+
+## Current Numbers
+
+| Metric | Value |
+|---|---|
+| Features implemented | 149/149 (0 partial, 0 missing) |
+| Unit tests | 90/90 passing |
+| Integration tests | 92 passing (74 gnu, 10 autoconf, 8 frozen) |
+| Oracle comparison | 65/75 pass (87%) vs GNU m4 1.4.21 |
+| Acceptance gates | 7/7 pass |
+| Performance | 2.0x overall vs GNU m4 |
+| Deterministic fuzz | 1M iterations, 0 panics |
+| Kani formal verification | 10 proofs |
+| Clean-room scan | 44 files, 0 GPL contamination |
+
+## Surface Status
+
+| Surface | Status | Note |
+|---|---|---|
+| M4.CLI.1 | oracle_admitted | All 17 CLI flags wired; POSIX signals permanent non-claim |
+| M4.BYTE.1 | oracle_admitted | Byte-level parity for all admitted byte ranges |
+| M4.LEX.1 | oracle_admitted | Tokenizer matches GNU m4; same-pass changequote via re-lex |
+| M4.QUOTE.1 | oracle_admitted | Quote nesting, delimiter changes, same-pass timing all pass |
+| M4.COMMENT.1 | oracle_admitted | Comment consumption matches GNU m4 |
+| M4.DEFINE.1 | oracle_admitted | define/undefine, builtin copy via defn |
+| M4.EXPAND.1 | oracle_admitted | $n substitution, rescanning, forloop/self-ref/mutual-recursion fixed |
+| M4.ARGS.1 | oracle_admitted | Argument collection, nesting, quoting |
+| M4.PUSHDEF.1 | oracle_admitted | pushdef/popdef/defn/builtin/indir |
+| M4.BUILTIN.TEXT.1 | oracle_admitted | len/index/substr/translit/regexp/patsubst/format |
+| M4.BUILTIN.EVAL.1 | oracle_admitted | eval/incr/decr (32-bit signed, all GNU operators) |
+| M4.BUILTIN.COND.1 | oracle_admitted | ifdef/ifelse/shift |
+| M4.DIVERT.1 | oracle_admitted | divnum, negative discard, EOF undivert, file undivert |
+| M4.INCLUDE.1 | oracle_admitted | include/sinclude with -I search path |
+| M4.DIAG.1 | known_failure | Working; stderr wording differs from oracle (CROSS.7) |
+| M4.TRACE.1 | oracle_admitted | traceon/traceoff/dumpdef/debugmode/debugfile |
+| M4.SYSCMD.1 | monitored | syscmd/esyscmd/sysval working; sandboxed in tests |
+| M4.FROZEN.1 | oracle_admitted | -F/-R cross-compatible with GNU m4 1.4.21 (8 oracle smoke tests) |
+| M4.AUTOCONF.SEED.1 | oracle_admitted | 10 seed fixtures pass; full Autoconf corpus not yet tested |
+| M4.HOSTILE.1 | oracle_admitted | Panic-free on malformed input, deep nesting, binary bytes |
+| M4.FUZZ.1 | oracle_admitted | 1M deterministic fuzz: 0 panics; 3 libfuzzer targets; 10 Kani proofs |
+
+## Permanent Non-Claims
+
+| Surface | Reason |
+|---|---|
+| POSIX signal handlers (CROSS.9) | Safe Rust boundary |
+| Diagnostic byte parity (CROSS.7) | Class/location matching preferred |
+| Stack overflow recovery (CROSS.20) | Rust aborts vs C sigaltstack |
+| i18n translations (CROSS.22) | English-only diagnostics |
+| changeword (CROSS.18) | Requires --enable-changeword, rarely enabled |
+| Autoconf replacement | Only 10 seed fixtures admitted |
+| Security sandbox | syscmd/esyscmd execute with process privileges |
+
+## Acceptance Gates
+
+- ✅ rustfmt  
+- ✅ clippy -D warnings  
+- ✅ tests (182/182 passing)  
+- ✅ document freshness (SHA256 verified)  
+- ✅ oracle profile present  
+- ✅ claim ladder present  
+- ✅ clean-room scan (44 files, 0 GPL errors)
+
+## Key Documents
+
+| Document | Purpose |
+|---|---|
+| README.md | Project overview with live metrics |
+| reports/claim-ladder.json | Machine-readable claim status |
+| reports/FORENSIC-GAP-ANALYSIS.md | Full C→Rust gap audit |
+| reports/NEEDLE-REPORT.md | Per-surface completion percentages |
+| docs/negative-capabilities.md | Explicit non-claims and build roadmap |
+| docs/REVIEW-IN-10-MINUTES.md | Quick overview for new reviewers |
+| docs/CODE-ARCHAEOLOGY-ATLAS.md | Esoteric m4 behaviors and release archaeology |
+

@@ -1,0 +1,38 @@
+[package]
+name = "m4-rs-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.m4-rs-core]
+path = "../crates/m4-rs-core"
+
+[[bin]]
+name = "lexer_bytes"
+path = "fuzz_targets/lexer_bytes.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "eval_expression"
+path = "fuzz_targets/eval_expression.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "expansion_engine"
+path = "fuzz_targets/expansion_engine.rs"
+test = false
+doc = false
+bench = false
+
+# Prevent this from being workspace member
+[workspace]

@@ -1,0 +1,33 @@
+{
+  "kind": "gnu_m4_1_4_21_default",
+  "path": "/usr/bin/m4",
+  "version_output": "m4 (GNU M4) 1.4.21\nCopyright (C) 2026 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n\nWritten by Rene' Seindal.\n",
+  "sha256": "2ac39828a6f543e8091347622d879ea01f8c80402bd624529696fba137c9f204",
+  "platform": "linux-x86_64",
+  "locale": "C",
+  "shell": "/bin/sh",
+  "os_release": "CachyOS",
+  "features": {
+    "posix_mode": false,
+    "prefix_builtins": true,
+    "synclines": true,
+    "changeword": false,
+    "frozen_files": true,
+    "debug_flags": [
+      "a",
+      "c",
+      "e",
+      "f",
+      "l",
+      "q",
+      "t",
+      "x",
+      "V"
+    ]
+  },
+  "unsupported_builtins": [],
+  "admitted_at": "1781816602",
+  "receipt_registry": [
+    "M4.ORACLE.1"
+  ]
+}

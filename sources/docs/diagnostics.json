@@ -1,0 +1,15 @@
+{"schema":"m4-rs-structured-doc-v1","title":"Diagnostics Parity","sections":[
+{"type":"paragraph","text":"Diagnostics are a parity surface. `m4-rs` implements all diagnostic builtins and targets class/location matching."},
+{"type":"heading","level":2,"text":"Implemented"},
+{"type":"table","headers":["Feature","Status"],"rows":[
+["errprint(message)","✅ Working"],
+["__file__","✅ Working"],
+["__line__","✅ Working"],
+["m4exit(code)","✅ Working"],
+["Unclosed quote error","✅ Class/location match"],
+["Excess arguments warning","✅ Class/location match"]
+]},
+{"type":"heading","level":2,"text":"Comparison Strategy"},
+{"type":"paragraph","text":"1. Class + source location match. 2. Stable substring. 3. Byte-exact where stable."},
+{"type":"paragraph","text":"M4.DIAG.1 is `known_failure`. Wording differs from GNU m4 (CROSS.7 — errno vs io::Error, no gettext). Permanent non-claim for byte-exact diagnostic parity."}
+]}

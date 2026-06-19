@@ -1,0 +1,5 @@
+{"schema":"m4-rs-structured-doc-v1","title":"xtask","generated_note":false,"sections":[
+{"type":"paragraph","text":"Project maintenance tasks for m4-rs. Rust-native task runner (no Python)."},
+{"type":"paragraph","text":"Run `cargo xtask` for available commands: check, fmt, clippy, test, oracle, compare, gnu-compare, generate, receipts, claims, cleanroom, fuzz, smoke, bench, status."},
+{"type":"paragraph","text":"**License:** MIT OR Apache-2.0. **Author:** infinityabundance <255699974+infinityabundance@users.noreply.github.com>."}
+]}

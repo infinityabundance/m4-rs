@@ -1,0 +1,21 @@
+[package]
+name = "xtask"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Project maintenance tasks for m4-rs: fmt, clippy, tests, receipt freshness, court replay, document generation, DSSE signing."
+
+[[bin]]
+name = "xtask"
+path = "src/main.rs"
+
+[dependencies]
+serde_json.workspace = true
+serde = { workspace = true, features = ["derive"] }
+sha2.workspace = true
+hmac = "0.12"
+regex = "1"
+m4-oracle-rs = { path = "../crates/m4-oracle-rs" }
+m4-casefile-rs = { path = "../crates/m4-casefile-rs" }
+m4-rs-core = { path = "../crates/m4-rs-core" }
