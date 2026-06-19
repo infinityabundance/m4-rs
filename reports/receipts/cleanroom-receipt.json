@@ -1,8 +1,8 @@
 {
   "schema": "m4-rs-cleanroom-receipt-v1",
-  "generated_at": "1781835565",
-  "source_tree_sha256": "17bb19b3775592b952c4799ba75f6dc4b69560b4090b4bc0a417db7a22e7f9d6",
-  "files_scanned": 44,
+  "generated_at": "1781840391",
+  "source_tree_sha256": "cdce926c906092aea79eef2c97285a286c3324302f4f4b3c0e6d4eab1e54d321",
+  "files_scanned": 45,
   "errors": [],
   "warnings": [],
   "infos": [
@@ -95,7 +95,7 @@
       "explanation": "References GNU m4 version. Expected — we document our oracle target."
     },
     {
-      "file": "crates/m4-rs-cli/src/main.rs",
+      "file": "crates/m4-rs-cli/src/lib.rs",
       "line": 2,
       "class": "Info",
       "pattern": "forensic_parity_claim",
@@ -103,7 +103,7 @@
       "explanation": "Project methodology statement. Expected."
     },
     {
-      "file": "crates/m4-rs-cli/src/main.rs",
+      "file": "crates/m4-rs-cli/src/lib.rs",
       "line": 50,
       "class": "Info",
       "pattern": "forensic_parity_claim",
@@ -111,7 +111,7 @@
       "explanation": "Project methodology statement. Expected."
     },
     {
-      "file": "crates/m4-rs-cli/src/main.rs",
+      "file": "crates/m4-rs-cli/src/lib.rs",
       "line": 297,
       "class": "Info",
       "pattern": "forensic_parity_claim",
