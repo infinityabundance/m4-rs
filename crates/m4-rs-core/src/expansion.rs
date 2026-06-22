@@ -49,6 +49,17 @@ pub struct ExpansionEngine {
     /// Set to true when changequote/changecom modifies the quote config
     /// mid-input, signaling that remaining tokens should be re-lexed.
     needs_relex: bool,
+    /// Live call-stack depth of `expand_tokens_inner`. Every expansion path
+    /// (macro args, builtin re-expansion, re-lexing) funnels through that one
+    /// function, so guarding its depth here bounds the *native* recursion
+    /// regardless of which intermediate path recurses. This is distinct from
+    /// `recursion_limit`/`recursion_depth`, which govern *macro* self-reference;
+    /// some builtin/arg-collection paths recurse without touching those and
+    /// could otherwise overflow the native stack on pathological input.
+    call_depth: usize,
+    /// Hard ceiling for `call_depth`. When exceeded, expansion stops cleanly
+    /// (sets a nonzero exit code) instead of aborting via stack overflow.
+    pub max_call_depth: usize,
 }
 
 impl ExpansionEngine {
@@ -77,6 +88,10 @@ impl ExpansionEngine {
             pending_builtin_copy: None,
             relexer: Lexer::new(),
             needs_relex: false,
+            call_depth: 0,
+            // ~2000 native frames stays well under an 8 MiB default stack while
+            // permitting legitimately deep recursion (e.g. forloop/foreach).
+            max_call_depth: 2000,
         }
     }
 
@@ -174,6 +189,25 @@ impl ExpansionEngine {
     }
 
     fn expand_tokens_inner(&mut self, tokens: &[Token]) {
+        // Guard the native call stack. All expansion recursion funnels through
+        // here; if it runs away (e.g. mutually recursive builtins under a
+        // corrupted quote state) we stop cleanly rather than overflow the stack.
+        if self.call_depth >= self.max_call_depth {
+            if self.exit_code.is_none() {
+                eprintln!(
+                    "m4: recursion limit of {} exceeded, use -L<N> to change it",
+                    self.max_call_depth
+                );
+                self.exit_code = Some(1);
+            }
+            return;
+        }
+        self.call_depth += 1;
+        self.expand_tokens_inner_impl(tokens);
+        self.call_depth -= 1;
+    }
+
+    fn expand_tokens_inner_impl(&mut self, tokens: &[Token]) {
         let mut i = 0;
         while i < tokens.len() {
             let token = &tokens[i];
