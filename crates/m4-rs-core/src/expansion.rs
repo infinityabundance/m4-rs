@@ -327,8 +327,16 @@ impl ExpansionEngine {
         // loops from $0→self and define(`x',`x') patterns).
         // Recursive calls through intermediate macros (greater depth) are
         // allowed (e.g., counter→ifelse→counter with different args).
+        //
+        // BUT only block the ARGUMENT-LESS self-reference (the genuine
+        // `define(x,x)` / `$0→self` infinite loop). A re-entrant call WITH
+        // arguments (e.g. `AS_IF([c],[AS_IF([d],[e])])`) is a distinct
+        // invocation that consumes its arguments and terminates; blocking it
+        // dropped the inner call's args and leaked a bare macro name. True
+        // runaway recursion is still caught by the call_depth / max_call_depth
+        // guard in expand_tokens_inner (matching GNU m4's nesting limit).
         if let Some(&entered_depth) = self.expanding.get(name) {
-            if entered_depth >= self.recursion_depth {
+            if entered_depth >= self.recursion_depth && !has_args {
                 if !self.suppress_output {
                     self.emit(name);
                 }
