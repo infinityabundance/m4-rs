@@ -1,6 +1,6 @@
 [package]
 name = "m4-rs"
-version = "0.1.4"
+version = "0.1.5"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
@@ -18,7 +18,7 @@ name = "m4-rs"
 path = "src/main.rs"
 
 [dependencies]
-m4-rs-core = { version = "0.1.2", path = "crates/m4-rs-core" }
+m4-rs-core = { version = "0.1.4", path = "crates/m4-rs-core" }
 m4-oracle-rs = { version = "0.1.2", path = "crates/m4-oracle-rs" }
 m4-casefile-rs = { version = "0.1.2", path = "crates/m4-casefile-rs" }
 m4-rs-cli = { version = "0.1.2", path = "crates/m4-rs-cli" }
