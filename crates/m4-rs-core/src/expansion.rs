@@ -433,8 +433,11 @@ impl ExpansionEngine {
                             let saved_output = std::mem::take(&mut self.output);
                             let saved_depth = self.recursion_depth;
                             let after = self.expand_builtin(&def, &name, tokens, i, has_args);
-                            current_arg.extend_from_slice(&self.output);
-                            self.output = saved_output;
+                            let result = std::mem::replace(&mut self.output, saved_output);
+                            // m4 rescan: a macro result placed in an argument is re-parsed, so its
+                            // top-level commas split arguments (e.g. shift -> `[b],[c]`). Without
+                            // this, nested shift / m4_shift3 / m4_foreach-over-macro-lists collapse.
+                            self.rescan_into_args(&result, &mut args, &mut current_arg, &mut paren_depth);
                             self.recursion_depth = saved_depth;
                             i = after;
                         } else {
@@ -456,8 +459,8 @@ impl ExpansionEngine {
                                 self.expand_user_macro(&def.text, &Args::new(&name));
                                 i += 1;
                             }
-                            current_arg.extend_from_slice(&self.output);
-                            self.output = saved_output;
+                            let result = std::mem::replace(&mut self.output, saved_output);
+                            self.rescan_into_args(&result, &mut args, &mut current_arg, &mut paren_depth);
                             self.recursion_depth = saved_depth;
                         }
                     } else {
@@ -472,6 +475,51 @@ impl ExpansionEngine {
             }
         }
         None
+    }
+
+    /// Re-tokenize a macro's expansion `result` and feed it back into argument collection so that
+    /// top-level commas split arguments and parens nest (the m4 rescan rule). Quoted spans in the
+    /// result are protected (their one quote level was already stripped at tokenization). This is
+    /// what makes nested list macros work: shift -> `[b],[c]` becomes two args, not one blob.
+    fn rescan_into_args(
+        &self,
+        result: &[u8],
+        args: &mut Vec<Vec<u8>>,
+        current_arg: &mut Vec<u8>,
+        paren_depth: &mut usize,
+    ) {
+        if result.is_empty() {
+            return;
+        }
+        let mut lex = Lexer::new();
+        lex.quote_config = self.quote_config.clone();
+        let toks = lex.tokenize(result);
+        for t in &toks {
+            match t.kind {
+                TokenKind::ParenOpen => {
+                    *paren_depth += 1;
+                    current_arg.extend_from_slice(&t.text);
+                }
+                TokenKind::ParenClose => {
+                    if *paren_depth > 0 {
+                        *paren_depth -= 1;
+                    }
+                    current_arg.extend_from_slice(&t.text);
+                }
+                TokenKind::Comma => {
+                    if *paren_depth == 0 {
+                        let trimmed = strip_leading_ws(current_arg);
+                        args.push(trimmed);
+                        current_arg.clear();
+                    } else {
+                        current_arg.extend_from_slice(&t.text);
+                    }
+                }
+                _ => {
+                    current_arg.extend_from_slice(&t.text);
+                }
+            }
+        }
     }
 
     fn expand_user_macro(&mut self, body: &[u8], args: &Args) {
