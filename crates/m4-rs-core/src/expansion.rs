@@ -1502,9 +1502,12 @@ fn expand_ranges(input: &[u8]) -> Vec<u8> {
 }
 
 fn strip_leading_ws(bytes: &[u8]) -> Vec<u8> {
+    // GNU m4 strips leading unquoted whitespace from each macro argument — blanks, tabs AND
+    // newlines/CRs. Multi-line calls (AC_CACHE_CHECK([msg],\n  [cache_var],\n  [body])) otherwise
+    // carry the line-break+indent into $2, producing `${\n  cache_var+set}` -> shell syntax error.
     let start = bytes
         .iter()
-        .position(|&b| b != b' ' && b != b'\t')
+        .position(|&b| b != b' ' && b != b'\t' && b != b'\n' && b != b'\r')
         .unwrap_or(bytes.len());
     bytes[start..].to_vec()
 }
@@ -1524,6 +1527,16 @@ mod tests {
         let t = Lexer::new().tokenize(b"hello world\n");
         e.expand_tokens(&t);
         assert_eq!(e.output, b"hello world\n");
+    }
+    #[test]
+    fn test_multiline_arg_strips_leading_newline() {
+        // A macro call whose args span lines (autoconf idiom) must not carry the line-break+indent
+        // into the argument: AC_CACHE_CHECK([msg],\n  [var],...) -> $2 == "var", not "\n  var".
+        let mut e = ExpansionEngine::new();
+        e.register_builtins();
+        let t = Lexer::new().tokenize(b"define(`C', `$2')C(`a',\n  `b',\n  `c')\n");
+        e.expand_tokens(&t);
+        assert_eq!(e.output, b"b\n");
     }
     #[test]
     fn test_define_and_expand_basic() {
