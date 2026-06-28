@@ -358,6 +358,17 @@ impl ExpansionEngine {
             }
         }
         if def.is_builtin {
+            // An args-REQUIRING builtin written WITHOUT a following `(` is not a macro call — GNU m4
+            // emits it literally. We must too, otherwise C conftest text gets shredded: `#include
+            // <stdio.h>` -> `# <stdio.h>`, `#ifdef X` -> `# X`, `#define F` -> `# F`, spuriously
+            // failing every compile/link probe. (Builtins that work bare — divnum/sysval/dnl/__file__
+            // — are NOT in this set and still fire without `(`.)
+            if !has_args && builtin_needs_args(name) {
+                if !self.suppress_output {
+                    self.emit(name);
+                }
+                return pos + 1;
+            }
             // Builtins: expand arguments during collection
             return self.expand_builtin(def, name, tokens, pos, has_args);
         }
@@ -684,8 +695,12 @@ impl ExpansionEngine {
             // during body expansion, it's blocked (direct self-reference).
             self.expanding
                 .insert(args.macro_name.clone(), self.recursion_depth);
-            // relexer.quote_config is kept in sync by changequote/changecom handlers.
-            // No per-expansion clone needed here.
+            // Sync the relexer to the CURRENT quote/comment config before re-lexing the macro body.
+            // The changequote/changecom builtins keep it synced, but a host (autoconf-rs) that sets
+            // the comment char DIRECTLY on quote_config bypasses those handlers — leaving the relexer
+            // with the default `#` comment. That made `#include <h>` inside a macro body (every conftest
+            // emitted by AC_CHECK_HEADER/FUNC/…) lex as a COMMENT and vanish. Always sync here.
+            self.relexer.quote_config = self.quote_config.clone();
             let new_tokens = self.relexer.tokenize(&result);
             self.expand_tokens_inner(&new_tokens);
             self.expanding.remove(&args.macro_name);
@@ -1526,6 +1541,19 @@ fn expand_ranges(input: &[u8]) -> Vec<u8> {
     r
 }
 
+/// Builtins that REQUIRE arguments — GNU m4 leaves them literal when written without a following `(`
+/// (so `#include`/`#ifdef`/`#define` in C conftest text survive). Builtins that work bare (dnl, divnum,
+/// sysval, divert, undivert, __file__, __line__, m4exit, …) are deliberately NOT listed.
+fn builtin_needs_args(name: &[u8]) -> bool {
+    matches!(
+        name,
+        b"define" | b"undefine" | b"defn" | b"pushdef" | b"popdef" | b"indir" | b"builtin"
+            | b"ifdef" | b"ifelse" | b"shift" | b"include" | b"sinclude" | b"len" | b"index"
+            | b"regexp" | b"substr" | b"translit" | b"patsubst" | b"format" | b"incr" | b"decr"
+            | b"eval" | b"syscmd" | b"esyscmd" | b"m4wrap" | b"dumpdef" | b"maketemp" | b"mkstemp"
+    )
+}
+
 fn strip_leading_ws(bytes: &[u8]) -> Vec<u8> {
     // GNU m4 strips leading unquoted whitespace from each macro argument. We strip blanks+tabs only,
     // NOT newlines: this fn runs on the *accumulated bytes* of an arg, which can't tell whitespace
@@ -1574,6 +1602,17 @@ mod tests {
         let t = Lexer::new().tokenize(b"define(`D', `$1')D(\n  `\nhello')\n");
         e.expand_tokens(&t);
         assert_eq!(e.output, b"\nhello\n");
+    }
+    #[test]
+    fn test_bare_args_builtin_emit_literally() {
+        // An args-requiring builtin without `(` is emitted literally (changecom set away from '#' so
+        // '#' is not a comment here, matching the autoconf context). include/define/ifdef survive.
+        let mut e = ExpansionEngine::new();
+        e.register_builtins();
+        e.quote_config.change_comment(Some("\0"), Some("\n"));
+        let t = Lexer::new().tokenize(b"x include y define z ifdef w\n");
+        e.expand_tokens(&t);
+        assert_eq!(e.output, b"x include y define z ifdef w\n");
     }
     #[test]
     fn test_define_and_expand_basic() {
