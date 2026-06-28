@@ -1604,6 +1604,19 @@ mod tests {
         assert_eq!(e.output, b"\nhello\n");
     }
     #[test]
+    fn test_nested_macro_body_include_preserved() {
+        // OUTER -> INNER -> `#include <h>`: the inner directive must survive the depth-2 rescan
+        // (mirrors AC_CHECK_HEADERS -> AC_CHECK_HEADER -> #include). '#' set non-comment.
+        let mut e = ExpansionEngine::new();
+        e.register_builtins();
+        e.quote_config.change_comment(Some("\0"), Some("\n"));
+        e.relexer.quote_config = e.quote_config.clone();
+        let t = Lexer::new()
+            .tokenize(b"define(`INNER',`#include <h>')define(`OUTER',`INNER')OUTER\n");
+        e.expand_tokens(&t);
+        assert_eq!(e.output, b"#include <h>\n");
+    }
+    #[test]
     fn test_bare_args_builtin_emit_literally() {
         // An args-requiring builtin without `(` is emitted literally (changecom set away from '#' so
         // '#' is not a comment here, matching the autoconf context). include/define/ifdef survive.
