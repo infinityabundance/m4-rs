@@ -301,7 +301,9 @@ impl Lexer {
                 self.advance(close_len);
                 let loc = self.location.clone();
                 let text = std::mem::take(&mut self.text_buf);
-                return Some(Token::new(TokenKind::Text, text, loc));
+                let mut t = Token::new(TokenKind::Text, text, loc);
+                t.from_quote = true; // interior of a quoted region — protect from arg-start ws-strip
+                return Some(t);
             } else {
                 // Nested close-quote — preserve close-quote chars in text.
                 // GNU m4 preserves one level of inner quoting in output.

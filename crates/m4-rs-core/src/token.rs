@@ -68,6 +68,10 @@ pub struct Token {
     pub text: Vec<u8>,
     /// Source location for diagnostics.
     pub location: SourceLocation,
+    /// True if this Text token is the interior of a quoted region (`[...]`). Argument collection uses
+    /// this to strip leading whitespace BEFORE a quote without touching a quoted body that begins
+    /// with whitespace (e.g. a Perl one-liner) — m4's "strip leading unquoted whitespace" rule.
+    pub from_quote: bool,
 }
 
 /// Source location tracking for diagnostics.
@@ -87,6 +91,7 @@ impl Token {
             kind,
             text,
             location,
+            from_quote: false,
         }
     }
 
@@ -96,6 +101,7 @@ impl Token {
             kind: TokenKind::Text,
             text: bytes.to_vec(),
             location,
+            from_quote: false,
         }
     }
 
@@ -105,6 +111,7 @@ impl Token {
             kind: TokenKind::Name,
             text: bytes.to_vec(),
             location,
+            from_quote: false,
         }
     }
 

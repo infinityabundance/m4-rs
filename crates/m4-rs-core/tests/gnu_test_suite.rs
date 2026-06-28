@@ -203,13 +203,13 @@ fn test_015_disable_quoting() {
 /// test_016: Quoted arguments preserve internal spaces.
 #[test]
 fn test_016_quote_whitespace_handling() {
-    // Quoted arg preserves leading/trailing spaces, only outer quotes stripped.
+    // Quoted arg preserves leading AND trailing spaces — only the outer quotes are stripped.
     let output = expand(b"define(`f', `[$1]')f(`  hello  ')\n");
-    // $1 = "  hello  " (leading spaces stripped by argument collection, trailing kept)
-    // Actually: leading whitespace is stripped during arg collection.
-    // The quoted content is "  hello  " with two leading spaces, one trailing.
-    // After arg trimming: "hello  " (leading spaces stripped, trailing preserved)
-    assert_eq!(output, b"[hello  ]\n");
+    // The whole arg is quoted (`...'), so there is NO unquoted leading whitespace to strip and the
+    // quoted body is verbatim. Verified against GNU m4 1.4.21: f(`  hello  ') -> [  hello  ].
+    // (The previous `[hello  ]` expectation encoded a byte-level strip bug that also damaged quoted
+    // bodies beginning with whitespace; fixed by token-level, quote-aware arg-start trimming.)
+    assert_eq!(output, b"[  hello  ]\n");
 }
 
 // ============================================================================

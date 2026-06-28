@@ -386,20 +386,27 @@ impl ExpansionEngine {
         let mut current_arg = Vec::new();
         let mut paren_depth: usize = 0;
         let mut i = start_pos;
+        // m4 strips leading unquoted whitespace from each argument. `arg_started` tracks whether the
+        // current arg has yet seen content (a name, nested paren, quoted text, or non-ws text). While
+        // false at the top level we drop leading whitespace tokens; a quoted-interior token (from_quote)
+        // counts as content and is preserved verbatim, so a quoted body that begins with a newline is
+        // not damaged. Fixes the cache-var-newline cluster (AC_CACHE_CHECK([m],\n [var],...) -> $2=="var")
+        // without the stow/upscaledb regression of the earlier byte-level strip.
+        let mut arg_started = false;
 
         while i < tokens.len() {
             let token = &tokens[i];
             // DEBUG: eprintln!("  token[{}]: {:?} text={:?}", i, token.kind, String::from_utf8_lossy(&token.text));
             match token.kind {
                 TokenKind::ParenOpen => {
+                    arg_started = true;
                     paren_depth += 1;
                     current_arg.extend_from_slice(&token.text);
                     i += 1;
                 }
                 TokenKind::ParenClose => {
                     if paren_depth == 0 {
-                        let trimmed = strip_leading_ws(&current_arg);
-                        args.push(trimmed);
+                        args.push(std::mem::take(&mut current_arg));
                         return Some((
                             Args {
                                 macro_name: Vec::new(),
@@ -414,9 +421,8 @@ impl ExpansionEngine {
                 }
                 TokenKind::Comma => {
                     if paren_depth == 0 {
-                        let trimmed = strip_leading_ws(&current_arg);
-                        args.push(trimmed);
-                        current_arg = Vec::new();
+                        args.push(std::mem::take(&mut current_arg));
+                        arg_started = false;
                         i += 1;
                     } else {
                         current_arg.extend_from_slice(&token.text);
@@ -424,6 +430,7 @@ impl ExpansionEngine {
                     }
                 }
                 TokenKind::Name => {
+                    arg_started = true;
                     let name = token.text.clone();
                     let def = self.macro_table.lookup(&name).cloned();
                     if let Some(def) = def {
@@ -469,7 +476,25 @@ impl ExpansionEngine {
                     }
                 }
                 _ => {
-                    current_arg.extend_from_slice(&token.text);
+                    // Text token. A quoted-interior token is content (preserve verbatim, incl. a
+                    // leading newline). An unquoted text token at the arg's start has its leading
+                    // whitespace stripped (m4's rule); once any content lands, text is verbatim.
+                    if token.from_quote {
+                        arg_started = true;
+                        current_arg.extend_from_slice(&token.text);
+                    } else if paren_depth == 0 && !arg_started {
+                        let t = &token.text;
+                        let nonws = t
+                            .iter()
+                            .position(|&b| b != b' ' && b != b'\t' && b != b'\n' && b != b'\r')
+                            .unwrap_or(t.len());
+                        if nonws < t.len() {
+                            arg_started = true;
+                            current_arg.extend_from_slice(&t[nonws..]);
+                        }
+                    } else {
+                        current_arg.extend_from_slice(&token.text);
+                    }
                     i += 1;
                 }
             }
@@ -1530,6 +1555,25 @@ mod tests {
         let t = Lexer::new().tokenize(b"hello world\n");
         e.expand_tokens(&t);
         assert_eq!(e.output, b"hello world\n");
+    }
+    #[test]
+    fn test_multiline_arg_strips_leading_newline() {
+        // Multi-line call (the autoconf idiom): the line-break+indent before each arg is dropped.
+        let mut e = ExpansionEngine::new();
+        e.register_builtins();
+        let t = Lexer::new().tokenize(b"define(`C', `$2')C(`a',\n  `b',\n  `c')\n");
+        e.expand_tokens(&t);
+        assert_eq!(e.output, b"b\n");
+    }
+    #[test]
+    fn test_quoted_interior_newline_preserved() {
+        // Non-regression guard: a quoted body that BEGINS with a newline keeps it (only whitespace
+        // before the quote is dropped). This is what the earlier byte-level strip got wrong.
+        let mut e = ExpansionEngine::new();
+        e.register_builtins();
+        let t = Lexer::new().tokenize(b"define(`D', `$1')D(\n  `\nhello')\n");
+        e.expand_tokens(&t);
+        assert_eq!(e.output, b"\nhello\n");
     }
     #[test]
     fn test_define_and_expand_basic() {
