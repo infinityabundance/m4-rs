@@ -60,6 +60,14 @@ pub struct ExpansionEngine {
     /// Hard ceiling for `call_depth`. When exceeded, expansion stops cleanly
     /// (sets a nonzero exit code) instead of aborting via stack overflow.
     pub max_call_depth: usize,
+    /// Hard ceiling on the live output buffer. *Breadth*-driven runaways
+    /// (re-scan accumulation, foreach over a corrupt list, version-probe loops
+    /// in automake macros) grow output without ever deepening `call_depth`, so
+    /// the depth guard alone can't catch them — they OOM-abort the process,
+    /// which in batch corpus runs takes down a whole worker. When the active
+    /// buffer crosses this size we stop cleanly with a nonzero exit code. Set
+    /// far above any real configure script (those are ~1 MiB).
+    pub max_output_bytes: usize,
 }
 
 impl ExpansionEngine {
@@ -92,6 +100,13 @@ impl ExpansionEngine {
             // ~2000 native frames stays well under an 8 MiB default stack while
             // permitting legitimately deep recursion (e.g. forloop/foreach).
             max_call_depth: 2000,
+            // 256 MiB: orders of magnitude above any real configure script, so
+            // a trip means genuine runaway, not a large-but-valid expansion.
+            // Overridable via M4_MAX_OUTPUT_BYTES (diagnostics / tuning).
+            max_output_bytes: std::env::var("M4_MAX_OUTPUT_BYTES")
+                .ok()
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(256 * 1024 * 1024),
         }
     }
 
@@ -189,6 +204,12 @@ impl ExpansionEngine {
     }
 
     fn expand_tokens_inner(&mut self, tokens: &[Token]) {
+        // Once any runaway/limit guard has tripped (exit_code set), abandon all
+        // further expansion so the whole call tree unwinds immediately instead
+        // of continuing to allocate.
+        if self.exit_code.is_some() {
+            return;
+        }
         // Guard the native call stack. All expansion recursion funnels through
         // here; if it runs away (e.g. mutually recursive builtins under a
         // corrupted quote state) we stop cleanly rather than overflow the stack.
@@ -197,6 +218,19 @@ impl ExpansionEngine {
                 eprintln!(
                     "m4: recursion limit of {} exceeded, use -L<N> to change it",
                     self.max_call_depth
+                );
+                self.exit_code = Some(1);
+            }
+            return;
+        }
+        // Breadth-driven runaway guard: bail before the active buffer exhausts
+        // memory. Once tripped, exit_code is set so every enclosing frame
+        // unwinds quickly without emitting more.
+        if self.output.len() > self.max_output_bytes {
+            if self.exit_code.is_none() {
+                eprintln!(
+                    "m4: output limit of {} bytes exceeded (runaway expansion)",
+                    self.max_output_bytes
                 );
                 self.exit_code = Some(1);
             }
@@ -392,7 +426,33 @@ impl ExpansionEngine {
         tokens: &[Token],
         start_pos: usize,
     ) -> Option<(Args, usize)> {
-        // eprintln!("collect_and_expand_args: start_pos={}", start_pos);
+        // Argument collection expands nested macros (m4 evaluates arguments
+        // before the call), and that expansion can recurse back through here —
+        // a path that bypasses expand_tokens_inner, so its depth/output guards
+        // never see it. Without a guard here, a deep re-expansion (e.g. gettext
+        // AC_LIB_* macros nesting AC_LIB_WITH_FINAL_PREFIX inside their own
+        // argument) runs the native stack / output buffer away and OOM-aborts
+        // the whole process. Guard both bounds here too, and stop cleanly.
+        if self.call_depth >= self.max_call_depth || self.output.len() > self.max_output_bytes {
+            if self.exit_code.is_none() {
+                eprintln!(
+                    "m4: expansion limit exceeded during argument collection (runaway re-scan)"
+                );
+                self.exit_code = Some(1);
+            }
+            return None;
+        }
+        self.call_depth += 1;
+        let r = self.collect_and_expand_args_impl(tokens, start_pos);
+        self.call_depth -= 1;
+        r
+    }
+
+    fn collect_and_expand_args_impl(
+        &mut self,
+        tokens: &[Token],
+        start_pos: usize,
+    ) -> Option<(Args, usize)> {
         let mut args = Vec::new();
         let mut current_arg = Vec::new();
         let mut paren_depth: usize = 0;
@@ -406,6 +466,20 @@ impl ExpansionEngine {
         let mut arg_started = false;
 
         while i < tokens.len() {
+            // Breadth guard: nested-macro re-expansion accumulates into the
+            // per-frame `current_arg` buffer, which can grow exponentially
+            // (each level multiplies the prior) — invisible to the output-size
+            // guard since it never reaches self.output until the call returns.
+            // Bail the moment a single argument buffer crosses the ceiling.
+            if self.exit_code.is_some() || current_arg.len() > self.max_output_bytes {
+                if self.exit_code.is_none() {
+                    eprintln!(
+                        "m4: argument size limit exceeded (runaway re-scan expansion)"
+                    );
+                    self.exit_code = Some(1);
+                }
+                return None;
+            }
             let token = &tokens[i];
             // DEBUG: eprintln!("  token[{}]: {:?} text={:?}", i, token.kind, String::from_utf8_lossy(&token.text));
             match token.kind {
