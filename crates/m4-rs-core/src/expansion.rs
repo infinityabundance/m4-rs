@@ -60,6 +60,10 @@ pub struct ExpansionEngine {
     /// Hard ceiling for `call_depth`. When exceeded, expansion stops cleanly
     /// (sets a nonzero exit code) instead of aborting via stack overflow.
     pub max_call_depth: usize,
+    /// Set true ONLY by the runaway/limit guards (call-depth, output-size, arg-size). Distinct from
+    /// exit_code (which m4exit/m4_fatal/recoverable builtin errors also set): when `aborted` is true the
+    /// engine unwinds the whole expansion; a mere nonzero exit_code does NOT stop expansion.
+    pub aborted: bool,
     /// Hard ceiling on the live output buffer. *Breadth*-driven runaways
     /// (re-scan accumulation, foreach over a corrupt list, version-probe loops
     /// in automake macros) grow output without ever deepening `call_depth`, so
@@ -107,6 +111,7 @@ impl ExpansionEngine {
                 .ok()
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(256 * 1024 * 1024),
+            aborted: false,
         }
     }
 
@@ -204,10 +209,13 @@ impl ExpansionEngine {
     }
 
     fn expand_tokens_inner(&mut self, tokens: &[Token]) {
-        // Once any runaway/limit guard has tripped (exit_code set), abandon all
-        // further expansion so the whole call tree unwinds immediately instead
-        // of continuing to allocate.
-        if self.exit_code.is_some() {
+        // Once a runaway/limit GUARD has tripped, abandon all further expansion so the whole call tree
+        // unwinds immediately instead of continuing to allocate. Use a dedicated `aborted` flag, NOT
+        // exit_code: m4 macros legitimately set a nonzero exit_code via m4exit / m4_fatal / recoverable
+        // builtin-arg errors (e.g. libtool's `_lt_decl_filter: too few arguments`) and the engine then
+        // CONTINUES — short-circuiting on exit_code made one such error cascade-kill every subsequent
+        // AC_DEFUN (the whole automake/libtool macro file leaked).
+        if self.aborted {
             return;
         }
         // Guard the native call stack. All expansion recursion funnels through
@@ -221,6 +229,7 @@ impl ExpansionEngine {
                 );
                 self.exit_code = Some(1);
             }
+            self.aborted = true;
             return;
         }
         // Breadth-driven runaway guard: bail before the active buffer exhausts
@@ -234,6 +243,7 @@ impl ExpansionEngine {
                 );
                 self.exit_code = Some(1);
             }
+            self.aborted = true;
             return;
         }
         self.call_depth += 1;
@@ -440,6 +450,7 @@ impl ExpansionEngine {
                 );
                 self.exit_code = Some(1);
             }
+            self.aborted = true;
             return None;
         }
         self.call_depth += 1;
@@ -471,13 +482,14 @@ impl ExpansionEngine {
             // (each level multiplies the prior) — invisible to the output-size
             // guard since it never reaches self.output until the call returns.
             // Bail the moment a single argument buffer crosses the ceiling.
-            if self.exit_code.is_some() || current_arg.len() > self.max_output_bytes {
+            if self.aborted || current_arg.len() > self.max_output_bytes {
                 if self.exit_code.is_none() {
                     eprintln!(
                         "m4: argument size limit exceeded (runaway re-scan expansion)"
                     );
                     self.exit_code = Some(1);
                 }
+                self.aborted = true;
                 return None;
             }
             let token = &tokens[i];
@@ -879,6 +891,15 @@ impl ExpansionEngine {
                     self.quote_config.change_quote(o.as_deref(), c.as_deref());
                 } else {
                     self.quote_config.change_quote(None, None);
+                }
+                if std::env::var("M4_DEBUG_QUOTE").is_ok() {
+                    eprintln!(
+                        "[changequote] enabled={} open={:?} close={:?} out_len={}",
+                        self.quote_config.quoting_enabled,
+                        self.quote_config.open,
+                        self.quote_config.close,
+                        self.output.len()
+                    );
                 }
                 // Keep the relexer in sync so expand_user_macro doesn't
                 // need to clone quote_config on every expansion.

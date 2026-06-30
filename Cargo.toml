@@ -1,6 +1,6 @@
 [package]
 name = "m4-rs"
-version = "0.1.7"
+version = "0.1.8"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
@@ -18,7 +18,7 @@ name = "m4-rs"
 path = "src/main.rs"
 
 [dependencies]
-m4-rs-core = { version = "0.1.7", path = "crates/m4-rs-core" }
+m4-rs-core = { version = "0.1.8", path = "crates/m4-rs-core" }
 m4-oracle-rs = { version = "0.1.2", path = "crates/m4-oracle-rs" }
 m4-casefile-rs = { version = "0.1.2", path = "crates/m4-casefile-rs" }
 m4-rs-cli = { version = "0.1.2", path = "crates/m4-rs-cli" }
@@ -41,7 +41,7 @@ opt-level = 3
 strip = "symbols"
 
 [workspace.package]
-version = "0.1.7"
+version = "0.1.8"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/infinityabundance/m4-rs"

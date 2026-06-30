@@ -89,7 +89,7 @@ checksum = "68ab91017fe16c622486840e4c83c9a37afeff978bd239b5293d61ece587de66"
 
 [[package]]
 name = "m4-casefile-rs"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "serde",
  "serde_json",
@@ -98,7 +98,7 @@ dependencies = [
 
 [[package]]
 name = "m4-oracle-rs"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "serde",
  "serde_json",
@@ -107,7 +107,7 @@ dependencies = [
 
 [[package]]
 name = "m4-rs"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "m4-casefile-rs",
  "m4-oracle-rs",
@@ -124,7 +124,7 @@ dependencies = [
 
 [[package]]
 name = "m4-rs-core"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "regex",
 ]
@@ -273,7 +273,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "xtask"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "hmac",
  "m4-casefile-rs",
