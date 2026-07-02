@@ -72,6 +72,13 @@ pub struct ExpansionEngine {
     /// buffer crosses this size we stop cleanly with a nonzero exit code. Set
     /// far above any real configure script (those are ~1 MiB).
     pub max_output_bytes: usize,
+    /// Optional preprocessor applied to the RAW bytes of every `include`/`sinclude`d file
+    /// before tokenizing. m4-rs itself sets this to `None` (faithful m4). Embedders with a
+    /// different comment discipline use it — Autoconf disables `#`-as-comment globally (so the
+    /// generated shell's `#` passes through) and therefore must strip `#` comments from included
+    /// `.m4` macro files here, else a trailing doc comment like `])# MACRONAME` re-invokes the
+    /// just-defined macro. Keeping it on the include path means nested includes are covered too.
+    pub source_preprocessor: Option<fn(&[u8]) -> Vec<u8>>,
 }
 
 impl ExpansionEngine {
@@ -112,6 +119,7 @@ impl ExpansionEngine {
                 .and_then(|s| s.parse().ok())
                 .unwrap_or(256 * 1024 * 1024),
             aborted: false,
+            source_preprocessor: None,
         }
     }
 
@@ -1017,18 +1025,27 @@ impl ExpansionEngine {
             }
             b"shift" => {
                 if let Some(ref a) = args {
-                    if !a.is_empty() {
+                    if a.len() >= 2 {
+                        // GNU m4 `shift`: expand to all but the first argument, comma-separated,
+                        // with EACH argument re-quoted using the current quoting strings. The quoting
+                        // is essential — when the result is re-parsed (e.g. `m4_case`'s recursive
+                        // `m4_case([$1], m4_shift3($@))`, or nested `m4_foreach`), the quotes protect
+                        // any comma INSIDE an argument from being taken as an argument separator.
+                        // Emitting the quoted text (not a re-expanded copy) lets the enclosing
+                        // arg-collection rescan / caller strip exactly one quote level, matching m4.
+                        let o = self.quote_config.open.as_bytes().to_vec();
+                        let c = self.quote_config.close.as_bytes().to_vec();
                         let mut r = Vec::new();
                         for j in 2..=a.len() {
                             if j > 2 {
                                 r.push(b',');
                             }
+                            r.extend_from_slice(&o);
                             r.extend_from_slice(a.get(j));
+                            r.extend_from_slice(&c);
                         }
-                        if !r.is_empty() {
-                            let mut lex = Lexer::new();
-                            lex.quote_config = self.quote_config.clone();
-                            self.expand_tokens_inner(&lex.tokenize(&r));
+                        if !self.suppress_output {
+                            self.emit(&r);
                         }
                     }
                 }
@@ -1345,6 +1362,10 @@ impl ExpansionEngine {
                             })
                             .unwrap_or_else(|| std::path::PathBuf::from(&fname));
                         if let Ok(data) = std::fs::read(&resolved) {
+                            let data = match self.source_preprocessor {
+                                Some(pp) => pp(&data),
+                                None => data,
+                            };
                             let saved_file = self.current_file.clone();
                             self.current_file = resolved.to_string_lossy().to_string();
                             let mut lex = Lexer::new();
@@ -1379,6 +1400,10 @@ impl ExpansionEngine {
                             })
                             .unwrap_or_else(|| std::path::PathBuf::from(&fname));
                         if let Ok(data) = std::fs::read(&resolved) {
+                            let data = match self.source_preprocessor {
+                                Some(pp) => pp(&data),
+                                None => data,
+                            };
                             let saved_file = self.current_file.clone();
                             self.current_file = resolved.to_string_lossy().to_string();
                             let mut lex = Lexer::new();

@@ -645,6 +645,18 @@ fn test_132_shift() {
     );
 }
 
+/// shift must RE-QUOTE each remaining argument so a comma INSIDE an argument survives
+/// re-parsing. m4sugar's `m4_case`/`m4_foreach` recurse through `m4_shift`, so without the
+/// re-quoting a branch value like `[a,b]` splits on its comma and the whole dispatch mis-pairs
+/// (postgres `PGAC_ARG`'s `m4_case([$1], enable, [...], with, [...])` fell through to m4_fatal).
+#[test]
+fn test_shift_requotes_args_preserving_commas() {
+    let output = expand(b"define(`count', `$#')count(shift(`x', `a,b', `y'))\n");
+    let text = String::from_utf8_lossy(&output);
+    // After shift: `a,b',`y' -> two args (the comma in `a,b' is protected), so $# is 2, not 3.
+    assert!(text.contains('2'), "shift must keep `a,b' as one arg: {text}");
+}
+
 /// test_133: eval with ternary operator.
 #[test]
 fn test_133_eval_ternary() {
