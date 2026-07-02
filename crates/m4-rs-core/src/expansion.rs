@@ -261,6 +261,26 @@ impl ExpansionEngine {
                         // dnl suppresses output until and including the next newline.
                         // If this text token contains a newline, resume output after it.
                         if let Some(nl_pos) = token.text.iter().position(|&b| b == b'\n') {
+                            if token.from_quote {
+                                // dnl ate an unbalanced quote-open (e.g. a commented-out
+                                // `dnl AC_LANG_CONFTEST([AC_LANG_PROGRAM(` in git). The batch
+                                // lexer wrongly bundled the physically-separate lines after
+                                // that `[` into this one quoted token; real m4 discards raw
+                                // characters to the newline BEFORE quote recognition, so the
+                                // quote never forms. Reconstruct the raw remainder and re-lex
+                                // it so each following line is processed on its own (its dnl /
+                                // balanced quotes take effect) instead of leaking verbatim.
+                                self.suppress_output = false;
+                                let mut remaining: Vec<u8> =
+                                    token.text[nl_pos + 1..].to_vec();
+                                for t in &tokens[i + 1..] {
+                                    remaining.extend_from_slice(&t.text);
+                                }
+                                self.relexer.quote_config = self.quote_config.clone();
+                                let new_tokens = self.relexer.tokenize(&remaining);
+                                self.expand_tokens_inner(&new_tokens);
+                                return;
+                            }
                             self.suppress_output = false;
                             let after: Vec<u8> = token.text[nl_pos + 1..]
                                 .iter()
@@ -288,6 +308,18 @@ impl ExpansionEngine {
                     i += 1;
                 }
                 TokenKind::Name => {
+                    if self.suppress_output {
+                        // dnl is active: discard this token WITHOUT expanding it.
+                        // GNU m4 `dnl` deletes raw input up to (and including) the
+                        // next newline before any macro recognition happens, so a
+                        // defined macro name sitting on a dnl line must NOT expand
+                        // (seen in git's `dnl in the AC_CHECK_FUNC invocations above.`
+                        // -> AC_CHECK_FUNC wrongly expanded with empty args + the
+                        // trailing text leaked). Name tokens never carry a newline,
+                        // so suppression persists until a later token resets it.
+                        i += 1;
+                        continue;
+                    }
                     let name = &token.text;
                     if let Some(def) = self.macro_table.lookup(name) {
                         // Extract fields we need before calling expand_macro
@@ -1894,6 +1926,36 @@ mod tests {
         e.expand_tokens(&t);
         // dnl suppresses output for the rest of the line — but there's no newline
         assert!(e.output.starts_with(b"before"));
+    }
+
+    /// A defined macro name sitting on a `dnl` line must NOT be expanded.
+    /// (git: `dnl in the AC_CHECK_FUNC invocations above.` wrongly expanded
+    /// AC_CHECK_FUNC with empty args and leaked the trailing text.)
+    #[test]
+    fn test_dnl_suppresses_macro_on_same_line() {
+        let mut e = ExpansionEngine::new();
+        e.register_builtins();
+        let t = Lexer::new().tokenize(b"define(`FOO',`EXPANDED')dnl x FOO y\nafter");
+        e.expand_tokens(&t);
+        let out = String::from_utf8_lossy(&e.output);
+        assert!(!out.contains("EXPANDED"), "macro on dnl line must not expand: {out:?}");
+        assert!(out.contains("after"), "content after dnl newline must survive: {out:?}");
+    }
+
+    /// `dnl` followed by an unbalanced quote-open makes the batch lexer bundle the
+    /// physically-separate following lines into one quoted token; those lines must
+    /// NOT leak into output (git's commented-out `dnl AC_LANG_CONFTEST([AC_LANG_PROGRAM(`).
+    #[test]
+    fn test_dnl_eats_unbalanced_quote_open_line() {
+        let mut e = ExpansionEngine::new();
+        e.register_builtins();
+        let input = b"define(`FOO',`EXPANDED')dnl FOO(`open(\ndnl   body\ndnl )'\nafter\n";
+        let t = Lexer::new().tokenize(input);
+        e.expand_tokens(&t);
+        let out = String::from_utf8_lossy(&e.output);
+        assert!(!out.contains("EXPANDED"), "macro on dnl line must not expand: {out:?}");
+        assert!(!out.contains("body"), "bundled dnl lines must not leak: {out:?}");
+        assert!(out.contains("after"), "post-block content must survive: {out:?}");
     }
 
     /// divnum with string argument must not panic.
