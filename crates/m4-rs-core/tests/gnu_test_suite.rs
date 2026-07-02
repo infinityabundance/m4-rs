@@ -657,6 +657,28 @@ fn test_shift_requotes_args_preserving_commas() {
     assert!(text.contains('2'), "shift must keep `a,b' as one arg: {text}");
 }
 
+/// A quote MUST end the current name token, so `name[]macro` lexes as Name(name) + empty-quote
+/// + Name(macro) and the macro still expands. Without flushing the pending name at quote-open,
+/// `name` glued onto the macro's chars into one un-expandable name. (postgres pgac_arg_to_variable
+/// `$1[]_[]patsubst($2,-,_)` -> `enable_patsubst(...)` leaked into configure -> shell syntax error.)
+#[test]
+fn test_empty_quote_separates_name_from_following_macro() {
+    // Default quotes are ` and ', so the empty quote is `' (not []). `pre`'m`'post`.
+    let output = expand(b"define(`m', `M')pre`'m`'post\n");
+    let text = String::from_utf8_lossy(&output);
+    assert!(text.contains("preMpost"), "name-quote-macro must expand the macro: {text}");
+}
+
+/// `$` before a non-placeholder character is a literal `$`; the following character is processed
+/// independently. `$$1` must expand to `$` + arg1, not stay literal. (postgres PGAC_PATH_PROGS body
+/// `if test -z "$$1"` must become `"$PYTHON"`, not `"$$1"` -> everything downstream leaked.)
+#[test]
+fn test_dollar_dollar_n_yields_literal_dollar_plus_arg() {
+    let output = expand(b"define(`f', `$$1')f(PYTHON)\n");
+    let text = String::from_utf8_lossy(&output);
+    assert!(text.contains("$PYTHON"), "$$1 must be `$` + arg1: {text}");
+}
+
 /// test_133: eval with ternary operator.
 #[test]
 fn test_133_eval_ternary() {

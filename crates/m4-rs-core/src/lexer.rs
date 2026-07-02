@@ -195,7 +195,12 @@ impl Lexer {
 
         // ---- Quote open detection ----
         if self.quote_config.quoting_enabled && self.try_match(&self.quote_config.open.clone()) {
-            // Flush any pending text before entering quotes
+            // Flush any pending NAME *and* text before entering quotes. Without the name flush,
+            // `name[]macro` left `name` in name_buf and the following macro's chars appended to it
+            // (`z[]patsubst(...)` -> one Name `zpatsubst`, never expanded). A quote ends the current
+            // name just like `(` does, so `z[]patsubst` must lex as Name(z) + empty-quote + Name(patsubst).
+            // (postgres pgac_arg_to_variable = `$1[]_[]patsubst($2, -, _)`.)
+            let maybe_name = self.flush_name();
             let maybe_text = self.flush_text();
             self.quote_depth = 1;
             self.in_quoted = true;
@@ -203,6 +208,14 @@ impl Lexer {
             let open_len = self.quote_config.open.len();
             self.pos += open_len;
             self.advance(open_len);
+            // At most one of name/text is normally pending (a starting name flushes text first);
+            // if both somehow are, return the name now and defer the text.
+            if let Some(nt) = maybe_name {
+                if let Some(tt) = maybe_text {
+                    self.pending_token = Some(tt);
+                }
+                return Some(nt);
+            }
             if let Some(t) = maybe_text {
                 return Some(t);
             }

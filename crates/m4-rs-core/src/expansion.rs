@@ -804,9 +804,12 @@ impl ExpansionEngine {
                         continue;
                     }
                     _ => {
+                        // `$` before a non-placeholder char: the `$` is literal and the following
+                        // char is processed INDEPENDENTLY. Consuming both (advance 2) swallowed it,
+                        // so `$$1` came out literal instead of `$` + arg1 — GNU m4 gives `$<arg1>`.
+                        // (postgres PGAC_PATH_PROGS body `if test -z "$$1"` -> must be `"$PYTHON"`.)
                         result.push(b'$');
-                        result.push(body[i + 1]);
-                        i += 2;
+                        i += 1;
                         continue;
                     }
                 }
