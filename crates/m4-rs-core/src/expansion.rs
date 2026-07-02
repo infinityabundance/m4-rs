@@ -79,6 +79,12 @@ pub struct ExpansionEngine {
     /// `.m4` macro files here, else a trailing doc comment like `])# MACRONAME` re-invokes the
     /// just-defined macro. Keeping it on the include path means nested includes are covered too.
     pub source_preprocessor: Option<fn(&[u8]) -> Vec<u8>>,
+    /// Native (Rust) macro handlers, consulted before user-macro body expansion. Used for macros awkward
+    /// or impossible to express in pure m4 within this engine (e.g. Autoconf's `AS_CASE`: unbounded
+    /// [pat],[act] pairs — a recursive m4 form blows the arg-collection call-depth guard, and unrolling
+    /// is impossible since m4 only has $0-$9). Handler gets already collected+expanded args (arg 0 is the
+    /// WORD) and returns text that is RESCANNED once (like a macro body). Name must also be in the table.
+    pub native_macros: std::collections::HashMap<Vec<u8>, fn(&[Vec<u8>]) -> Vec<u8>>,
 }
 
 impl ExpansionEngine {
@@ -120,6 +126,7 @@ impl ExpansionEngine {
                 .unwrap_or(256 * 1024 * 1024),
             aborted: false,
             source_preprocessor: None,
+            native_macros: std::collections::HashMap::new(),
         }
     }
 
@@ -456,14 +463,33 @@ impl ExpansionEngine {
             // Builtins: expand arguments during collection
             return self.expand_builtin(def, name, tokens, pos, has_args);
         }
+        let native = self.native_macros.get(name).copied();
         if has_args {
             let paren_pos = pos + 1;
             // Expand arguments during collection
             if let Some((mut args, after)) = self.collect_and_expand_args(tokens, paren_pos + 1) {
                 args.macro_name = name.to_vec();
+                if let Some(nf) = native {
+                    // Handler returns text that, like any expansion, is rescanned once (strips one quote
+                    // level from multiply-quoted args, e.g. `[[*linux*]]` -> `[*linux*]` -> `*linux*`).
+                    let outv = nf(&args.args);
+                    if !outv.is_empty() {
+                        self.relexer.quote_config = self.quote_config.clone();
+                        let tk = self.relexer.tokenize(&outv);
+                        self.expand_tokens_inner(&tk);
+                    }
+                    return after;
+                }
                 self.expand_user_macro(&def.text, &args);
                 return after;
             }
+        }
+        if let Some(nf) = native {
+            let outv = nf(&[]);
+            if !self.suppress_output && !outv.is_empty() {
+                self.emit(&outv);
+            }
+            return pos + 1;
         }
         self.expand_user_macro(&def.text, &Args::new(name));
         pos + 1
